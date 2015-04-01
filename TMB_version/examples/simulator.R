@@ -6,8 +6,11 @@ library( RandomFields )
 library( TMB )
 library( INLA )
 
+# Version
+Version = "pref_samp_v2"
+# v2 -- added separate range for each GRF
+
 # Compile
-Version = "pref_samp_v1"
   #TmbFile = system.file("executables", package="SpatialDFA")
   TmbFile = "C:/Users/James.Thorson/Desktop/Project_git/pref_sampling/TMB_version/inst/executables"
 setwd( TmbFile )
@@ -26,9 +29,9 @@ betar = 0
 ###################
 # Simulate loop
 ###################
-Results = array(NA, dim=c(2,100,5), dimnames=list(c("joint","separate"),NULL,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range","Ypred_error")) )
+Results = array(NA, dim=c(2,100,7), dimnames=list(c("joint","separate"),NULL,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta",paste0("Range_",c("Nu","Gamma","Delta")),"Ypred_error")) )
 
-for(i in 1:nrow(Results)){
+for(i in 1:dim(Results)[2]){
   ###################
   # Simulate data
   ###################
@@ -70,10 +73,11 @@ for(i in 1:nrow(Results)){
   spde = inla.spde2.matern(mesh, alpha=2)
 
   # Data
-  if(Version=="pref_samp_v1") Data = list("n_stations"=n_stations, "n_knots"=mesh$n, "ncol_Xr"=ncol(Xr), "ncol_Xy"=ncol(Xy), "R_i"=R, "Y_i"=Y, "Xr"=Xr, "Xy"=Xy, "G0"=spde$param.inla$M0, "G1"=spde$param.inla$M1, "G2"=spde$param.inla$M2 )
+  if(Version%in%c("pref_samp_v1","pref_samp_v2")) Data = list("n_stations"=n_stations, "n_knots"=mesh$n, "ncol_Xr"=ncol(Xr), "ncol_Xy"=ncol(Xy), "R_i"=R, "Y_i"=Y, "Xr"=Xr, "Xy"=Xy, "G0"=spde$param.inla$M0, "G1"=spde$param.inla$M1, "G2"=spde$param.inla$M2 )
 
   # Parameters
   if(Version=="pref_samp_v1") Params = list("log_kappa"=log(1), "logtau_Nu"=log(1), "logtau_Gamma"=log(1), "logtau_Delta"=log(1), "betar"=rep(0,ncol(Xr)), "betay"=rep(0,ncol(Xy)), "Nu_input"=rep(0,Data$n_knots), "Gamma_input"=rep(0,Data$n_knots), "Delta_input"=rep(0,Data$n_knots) )
+  if(Version=="pref_samp_v2") Params = list("log_kappa"=rep(log(1),3), "logtau_Nu"=log(1), "logtau_Gamma"=log(1), "logtau_Delta"=log(1), "betar"=rep(0,ncol(Xr)), "betay"=rep(0,ncol(Xy)), "Nu_input"=rep(0,Data$n_knots), "Gamma_input"=rep(0,Data$n_knots), "Delta_input"=rep(0,Data$n_knots) )
 
   # Random
   Random = c( "Nu_input", "Gamma_input", "Delta_input" )
@@ -116,7 +120,7 @@ for(i in 1:nrow(Results)){
   
     # Diagnostics
     Report = obj$report()
-    Results[modelI,i,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")] = unlist( Report[c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")] )
+    Results[modelI,i,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta",paste0("Range_",c("Nu","Gamma","Delta")))] = unlist( Report[c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")] )
   
     # Calculate error in prediction of Ypred
     Ypred_error = sum(Report[["Ypred_i"]] - Ypred) / sum(Ypred)
@@ -125,13 +129,13 @@ for(i in 1:nrow(Results)){
 }
 
 # Plot results
-png( file="True_and_estimated_hyperparameters.png", width=2.5*2, height=2.5*4, res=200, units="in")
-  par( mfrow=c(4,2), mar=c(3,2,1,0), mgp=c(1.5,0.25,0), tck=-0.02, oma=c(0,0,2,0))
+png( file="True_and_estimated_hyperparameters.png", width=2.5*2, height=2.5*5, res=200, units="in")
+  par( mfcol=c(5,2), mar=c(3,2,1,0), mgp=c(1.5,0.25,0), tck=-0.02, oma=c(0,0,2,0))
   for(modelI in 1:2){
-    for(c in 1:4){
-      hist( Results[modelI,,c], breaks=10, main=c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")[c], xlab="", ylab="")
-      abline( v=c(SD_Nu,SD_Gamma,SD_Delta,Range)[c], lwd=2)
-      if(c==1) mtext( side=3, text=dimnames(Results)[[1]][c] )
+    for(c in 1:5){
+      hist( Results[modelI,,c], breaks=10, main=c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range","Ypred_error")[c], xlab="", ylab="", xlim=range(Results[,,c]))
+      abline( v=c(SD_Nu,SD_Gamma,SD_Delta,Range,0)[c], lwd=2)
+      if(c==1) mtext( side=3, text=dimnames(Results)[[1]][modelI], line=1 )
     }
   }
 dev.off()
