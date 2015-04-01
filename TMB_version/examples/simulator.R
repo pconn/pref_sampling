@@ -9,23 +9,24 @@ library( INLA )
 # Compile
 Version = "pref_samp_v1"
   #TmbFile = system.file("executables", package="SpatialDFA")
-  TmbFile = "C:/Users/James.Thorson/Desktop/Project_git/preferential_sampling/inst/executables"
+  TmbFile = "C:/Users/James.Thorson/Desktop/Project_git/pref_sampling/TMB_version/inst/executables"
 setwd( TmbFile )
 compile( paste0(Version,".cpp") )
 
 # Parameters
 n_stations = 200
 SpatialScale = 0.25
-SD_Nu = 0.5
-SD_Gamma = 0.5
-SD_Delta = 1
+  Range = optimize( f=function(n){ abs(dnorm(n,0,SpatialScale)/dnorm(0,0,SpatialScale)-0.1) }, interval=c(0,1))$minimum  # distance with 10% corr
+SD_Nu = 0.5     # Count
+SD_Gamma = 0.5  # Sampling intensity
+SD_Delta = 1    # Shared
 betay = 2
 betar = 0
 
 ###################
 # Simulate loop
 ###################
-Results = array(NA, dim=c(100,4), dimnames=list(NULL,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")) )
+Results = array(NA, dim=c(2,100,5), dimnames=list(c("joint","separate"),NULL,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range","Ypred_error")) )
 
 for(i in 1:nrow(Results)){
   ###################
@@ -58,7 +59,6 @@ for(i in 1:nrow(Results)){
   Ypred = exp(Xy*betay + Nu + Delta)
   Y = rpois( n=n_stations, lambda=ifelse(R==1, Ypred, NA))
 
-
   ###################
   # Fit model
   ###################
@@ -79,34 +79,59 @@ for(i in 1:nrow(Results)){
   Random = c( "Nu_input", "Gamma_input", "Delta_input" )
   #if(Use_REML==TRUE) ...
 
-  # Fixed values
-  Map = list()
-
-  # Load DLL
-  setwd( TmbFile )
-  dyn.load( dynlib(Version) )                                                         # log_tau=0.0,
-
-  # Initialization
-  obj <- MakeADFun(data=Data, parameters=Params, random=Random, map=Map, hessian=FALSE, inner.control=list(maxit=1000) )
-  obj$control <- c( obj$control, list(trace=1, parscale=1, REPORT=1, reltol=1e-12, maxit=100) )
-  obj$env$inner.control <- c(obj$env$inner.control, list("step.tol"=1e-8, "tol10"=1e-6, "grad.tol"=1e-8) )
-
-  # First run
-  Init = obj$fn( obj$par )
-  Initial_gradient = obj$gr( obj$par )
-
-  # Bounds
-  Upper = rep(Inf, length(obj$par) )
-  Lower = rep(-Inf, length(obj$par) )
-
-  # Run model
-  opt = nlminb(start=obj$env$last.par.best[-c(obj$env$random)], objective=obj$fn, gradient=obj$gr, upper=Upper, lower=Lower, control=list(eval.max=1e4, iter.max=1e4, trace=1, rel.tol=1e-14) )
-  opt[["final_gradient"]] = obj$gr( opt$par )
-  opt[["AIC"]] = 2*opt$objective + 2*length(opt$par)
-  opt[["BIC"]] = 2*opt$objective + length(opt$par) * log(n_stations)
-
-  # Diagnostics
-  Report = obj$report()
-  Results[i,] = unlist( Report[c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")] )
+  for( modelI in 1:2){
+    # Fixed values
+    Map = list()
+    
+    # If doing separate estimates, fix Delta_input
+    if(modelI==2){
+      Map[["Delta_input"]] = factor( rep(NA, length(Params[["Delta_input"]])) )
+      Map[["logtau_Delta"]] = factor( NA )
+    }
+  
+    # Load DLL
+    setwd( TmbFile )
+    dyn.load( dynlib(Version) )                                                         # log_tau=0.0,
+  
+    # Initialization
+    obj <- MakeADFun(data=Data, parameters=Params, random=Random, map=Map, hessian=FALSE, inner.control=list(maxit=1000) )
+    obj$control <- c( obj$control, list(trace=1, parscale=1, REPORT=1, reltol=1e-12, maxit=100) )
+    obj$env$inner.control <- c(obj$env$inner.control, list("step.tol"=1e-8, "tol10"=1e-6, "grad.tol"=1e-8) )
+  
+    # First run
+    Init = obj$fn( obj$par )
+    Initial_gradient = obj$gr( obj$par )
+  
+    # Bounds
+    Upper = rep(Inf, length(obj$par) )
+      Upper[grep("log_kappa",names(obj$par))] = 5
+    Lower = rep(-Inf, length(obj$par) )
+      Lower[grep("log_kappa",names(obj$par))] = -5
+  
+    # Run model
+    opt = nlminb(start=obj$env$last.par.best[-c(obj$env$random)], objective=obj$fn, gradient=obj$gr, upper=Upper, lower=Lower, control=list(eval.max=1e4, iter.max=1e4, trace=1, rel.tol=1e-14) )
+    opt[["final_gradient"]] = obj$gr( opt$par )
+    opt[["AIC"]] = 2*opt$objective + 2*length(opt$par)
+    opt[["BIC"]] = 2*opt$objective + length(opt$par) * log(n_stations)
+  
+    # Diagnostics
+    Report = obj$report()
+    Results[modelI,i,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")] = unlist( Report[c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")] )
+  
+    # Calculate error in prediction of Ypred
+    Ypred_error = sum(Report[["Ypred_i"]] - Ypred) / sum(Ypred)
+    Results[modelI,i,"Ypred_error"] = Ypred_error
+  }
 }
 
+# Plot results
+png( file="True_and_estimated_hyperparameters.png", width=2.5*2, height=2.5*4, res=200, units="in")
+  par( mfrow=c(4,2), mar=c(3,2,1,0), mgp=c(1.5,0.25,0), tck=-0.02, oma=c(0,0,2,0))
+  for(modelI in 1:2){
+    for(c in 1:4){
+      hist( Results[modelI,,c], breaks=10, main=c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")[c], xlab="", ylab="")
+      abline( v=c(SD_Nu,SD_Gamma,SD_Delta,Range)[c], lwd=2)
+      if(c==1) mtext( side=3, text=dimnames(Results)[[1]][c] )
+    }
+  }
+dev.off()

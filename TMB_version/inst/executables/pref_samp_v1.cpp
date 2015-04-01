@@ -83,12 +83,14 @@ Type objective_function<Type>::operator() ()
     // probability of sampling
     Rpred_i(i) = Gamma(i) + Delta(i);
     for(int c=0; c<ncol_Xr; c++) Rpred_i(i) += Xr(i,c) * betar(c);
-    if(R_i(i)==0) jnll -= log( 1-plogis(Rpred_i(i)) );
-    if(R_i(i)==1) jnll -= log( plogis(Rpred_i(i)) );
+    Rpred_i(i) = plogis(Rpred_i(i));
+    if(R_i(i)==0) jnll -= log( 1-Rpred_i(i) );
+    if(R_i(i)==1) jnll -= log( Rpred_i(i) );
     // probability of counts
     Ypred_i(i) = Nu(i) + Delta(i);
     for(int c=0; c<ncol_Xy; c++) Ypred_i(i) += Xy(i,c) * betay(c) ;
-    if( !isNA(Y_i(i)) ) jnll -= dpois( Y_i(i), exp(Ypred_i(i)), true );
+    Ypred_i(i) = exp(Ypred_i(i));
+    if( !isNA(Y_i(i)) ) jnll -= dpois( Y_i(i), Ypred_i(i), true );
   }
 
   // Spatial field summaries
@@ -96,6 +98,8 @@ Type objective_function<Type>::operator() ()
   REPORT( Sigma_Nu );
   REPORT( Sigma_Gamma );
   REPORT( Sigma_Delta );
+  REPORT( Rpred_i );
+  REPORT( Ypred_i );
 
   return jnll;
 }
