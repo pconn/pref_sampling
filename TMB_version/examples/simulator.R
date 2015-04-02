@@ -91,6 +91,7 @@ for(i in 1:dim(Results)[2]){
     if(modelI==2){
       Map[["Delta_input"]] = factor( rep(NA, length(Params[["Delta_input"]])) )
       Map[["logtau_Delta"]] = factor( NA )
+      Map[["log_kappa"]] = factor( c(1,2,NA) )
     }
   
     # Load DLL
@@ -121,6 +122,7 @@ for(i in 1:dim(Results)[2]){
     # Diagnostics
     Report = obj$report()
     Results[modelI,i,c("Sigma_Nu","Sigma_Gamma","Sigma_Delta",paste0("Range_",c("Nu","Gamma","Delta")))] = unlist( Report[c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range")] )
+    if(modelI==2) Results[modelI,i,c("Sigma_Delta","Range_Delta")] = NA
   
     # Calculate error in prediction of Ypred
     Ypred_error = sum(Report[["Ypred_i"]] - Ypred) / sum(Ypred)
@@ -129,13 +131,18 @@ for(i in 1:dim(Results)[2]){
 }
 
 # Plot results
-png( file="True_and_estimated_hyperparameters.png", width=2.5*2, height=2.5*5, res=200, units="in")
-  par( mfcol=c(5,2), mar=c(3,2,1,0), mgp=c(1.5,0.25,0), tck=-0.02, oma=c(0,0,2,0))
-  for(modelI in 1:2){
-    for(c in 1:5){
-      hist( Results[modelI,,c], breaks=10, main=c("Sigma_Nu","Sigma_Gamma","Sigma_Delta","Range","Ypred_error")[c], xlab="", ylab="", xlim=range(Results[,,c]))
-      abline( v=c(SD_Nu,SD_Gamma,SD_Delta,Range,0)[c], lwd=2)
+png( file="True_and_estimated_hyperparameters.png", width=2.5*dim(Results)[1], height=2.5*dim(Results)[3], res=200, units="in")
+  par( mfcol=c(7,2), mar=c(3,2,1,0), mgp=c(1.5,0.25,0), tck=-0.02, oma=c(0,0,2,0))
+  for(modelI in 1:dim(Results)[1]){
+    for(c in 1:dim(Results)[3]){
+      if( sum(!is.na(Results[modelI,,c]))>2 ){
+        hist( Results[modelI,,c], breaks=10, main=dimnames(Results)[[3]][c], xlab="", ylab="", xlim=range(Results[,,c],na.rm=TRUE))
+        abline( v=c(SD_Nu,SD_Gamma,SD_Delta,rep(Range,3),0)[c], lwd=2)
+      }else{
+        plot.new()
+      }
       if(c==1) mtext( side=3, text=dimnames(Results)[[1]][modelI], line=1 )
+      if( dimnames(Results)[[3]][c]=="Ypred_error") text( x=mean(axTicks(1)), y=mean(axTicks(2)), pos=4, labels=formatC(mean(Results[modelI,,c]),format="f",digits=3))
     }
   }
 dev.off()
