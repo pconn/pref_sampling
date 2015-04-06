@@ -1,0 +1,149 @@
+\begin{thebibliography}{25}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Banerjee \emph{et~al.}(2008)Banerjee, Gelfand, Finley \&
+  Sang}]{BanerjeeEtAl2008}
+Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Gaussian
+  predictive process models for large spatial datasets. \emph{Journal of the
+  Royal Statistical Society B}, \textbf{70}, 825--848.
+
+\bibitem[{Borchers \emph{et~al.}(2006)Borchers, Laake, Southwell \&
+  Paxton}]{Borchers2006}
+Borchers, D.L., Laake, J.L., Southwell, C. \& Paxton, C.G.M. (2006)
+  Accomodating unmodeled heterogeneity in double-observer distance sampling
+  surveys. \emph{Biometrics}, \textbf{62}, 372--378.
+
+\bibitem[{Buckland \emph{et~al.}(2001)Buckland, Anderson, Burnham, Laake,
+  Borchers \& Thomas}]{BucklandEtAl2001}
+Buckland, S., Anderson, D., Burnham, K., Laake, J., Borchers, D. \& Thomas, L.
+  (2001) \emph{Introduction to Distance Sampling: Estimating the abundance of
+  biological populations}. Oxford University Press, Oxford, U.K.
+
+\bibitem[{Chakraborty \emph{et~al.}(2010)Chakraborty, Gelfand, Wilson, Latimer
+  \& Silander~Jr}]{ChakrabortyEtAl2010}
+Chakraborty, A., Gelfand, A.E., Wilson, A.M., Latimer, A.M. \& Silander~Jr,
+  J.A. (2010) Modeling large scale species abundance with latent spatial
+  processes. \emph{The Annals of Applied Statistics}, 1403--1429.
+
+\bibitem[{Cochran(1977)}]{Cochran1977}
+Cochran, W. (1977) \emph{Sampling Techniques, 3rd Edition}. Wiley, New York.
+
+\bibitem[{Conn \emph{et~al.}(2014)Conn, Ver~Hoef, McClintock, Moreland, London,
+  Cameron, Dahle \& Boveng}]{ConnEtAl2014}
+Conn, P.B., Ver~Hoef, J.M., McClintock, B.T., Moreland, E.E., London, J.M.,
+  Cameron, M.F., Dahle, S.P. \& Boveng, P.L. (2014) Estimating multi-species
+  abundance using automated detection systems: ice-associated seals in the
+  eastern {B}ering {S}ea. \emph{Methods in Ecology and Evolution}, \textbf{5},
+  1280--1293.
+
+\bibitem[{Cressie(1993)}]{Cressie1993}
+Cressie, N.A.C. (1993) \emph{Statistics for spatial data, revised edition.}
+  Wiley, New York.
+
+\bibitem[{Diggle \emph{et~al.}(1998)Diggle, Tawn \& Moyeed}]{DiggleEtAl1998}
+Diggle, P.J., Tawn, J.A. \& Moyeed, R.A. (1998) Model-based geostatistics.
+  \emph{Journal of the Royal Statistical Society: Series C (Applied
+  Statistics)}, \textbf{47}(3), 299--350.
+
+\bibitem[{Diggle \emph{et~al.}(2010)Diggle, Menezes \& Su}]{DiggleEtAl2010}
+Diggle, P.J., Menezes, R. \& Su, T.l. (2010) Geostatistical inference under
+  preferential sampling. \emph{Journal of the Royal Statistical Society: Series
+  C (Applied Statistics)}, \textbf{59}(2), 191--232,
+  \doi{10.1111/j.1467-9876.2009.00701.x},
+  \urlprefix\url{http://dx.doi.org/10.1111/j.1467-9876.2009.00701.x}.
+
+\bibitem[{Elith \& Leathwick(2009)}]{ElithLeathwick2009}
+Elith, J. \& Leathwick, J.R. (2009) Species distribution models: ecological
+  explanation and prediction across space and time. \emph{Annual Review of
+  Ecology, Evolution, and Systematics}, \textbf{40}, 677--697.
+
+\bibitem[{Hedley \& Buckland(2004)}]{HedleyBuckland2004}
+Hedley, S. \& Buckland, S. (2004) Spatial models for line transect sampling.
+  \emph{Journal of Agricultural, Biological, and Environmental Statistics},
+  \textbf{9}, 181--199.
+
+\bibitem[{Hughes \& Haran(2013)}]{Hughes2013}
+Hughes, J. \& Haran, M. (2013) Dimension reduction and alleviation of
+  confounding for spatial generalized mixed models. \emph{Journal of the Royal
+  Statistical Society B}, \textbf{75}, 139--159.
+
+\bibitem[{Johnson \emph{et~al.}(2013)Johnson, Conn, Hooten, Ray \&
+  Pond}]{JohnsonEtAl2013}
+Johnson, D.S., Conn, P.B., Hooten, M., Ray, J. \& Pond, B. (2013) A probit
+  approach for spatio-temporal modeling of ecological occupancy data.
+  \emph{Ecology}, \textbf{94}, 801--808.
+
+\bibitem[{Johnson \emph{et~al.}(2010)Johnson, Laake \&
+  Ver~Hoef}]{JohnsonEtAl2010}
+Johnson, D., Laake, J. \& Ver~Hoef, J. (2010) A model-based approach for making
+  ecological inference from distance sampling data. \emph{Biometrics},
+  \textbf{66}, 310--318.
+
+\bibitem[{Latimer \emph{et~al.}(2009)Latimer, Banerjee, Sang, Moshner \&
+  Silander~Jr.}]{LatimerEtAl2009}
+Latimer, A.M., Banerjee, S., Sang, H., Moshner, E.S. \& Silander~Jr., J.A.
+  (2009) Hierarichical models facilitate spatial analysis of large data sets: a
+  case study on invasive plant species in the northern {U}nited {S}tates.
+  \emph{Ecology Letters}, \textbf{12}, 144--154.
+
+\bibitem[{MacKenzie \emph{et~al.}(2002)MacKenzie, Nichols, Lachman, Droege,
+  Royle \& Langtimm}]{MacKenzie2002}
+MacKenzie, D., Nichols, J., Lachman, G., Droege, S., Royle, J. \& Langtimm, C.
+  (2002) Estimating site occupancy rates when detection probabilities are less
+  than one. \emph{Ecology}, \textbf{83}, 2248--2255.
+
+\bibitem[{Manceur \& K{\"u}hn(2014)}]{ManceurKuhn2014}
+Manceur, A.M. \& K{\"u}hn, I. (2014) Inferring model-based probability of
+  occurrence from preferentially sampled data with uncertain absences using
+  expert knowledge. \emph{Methods in Ecology and Evolution}, \textbf{5}(8),
+  739--750.
+
+\bibitem[{Merckx \emph{et~al.}(2011)Merckx, Steyaert, Vanreusel, Vincx \&
+  Vanaverbeke}]{MerckxEtAl2011}
+Merckx, B., Steyaert, M., Vanreusel, A., Vincx, M. \& Vanaverbeke, J. (2011)
+  Null models reveal preferential sampling, spatial autocorrelation and
+  overfitting in habitat suitability modelling. \emph{Ecological Modelling},
+  \textbf{222}(3), 588 -- 597,
+  \doi{http://dx.doi.org/10.1016/j.ecolmodel.2010.11.016},
+  \urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0304380010006216}.
+
+\bibitem[{Miller \emph{et~al.}(2013)Miller, Burt, Rexstad \&
+  Thomas}]{MillerEtAl2013}
+Miller, D.L., Burt, M.L., Rexstad, E.A. \& Thomas, L. (2013) Spatial models for
+  distance sampling data: recent developments and future directions.
+  \emph{Methods in Ecology and Evolution}, \textbf{4}, 1001--1010.
+
+\bibitem[{Pati \emph{et~al.}(2011)Pati, Reich \& Dunson}]{PatiEtAl2011}
+Pati, D., Reich, B.J. \& Dunson, D.B. (2011) Bayesian geostatistical modelling
+  with informative sampling locations. \emph{Biometrika}, \textbf{98}(1),
+  35--48.
+
+\bibitem[{Reich \emph{et~al.}(2006)Reich, Hodges \& Zadnik}]{Reich2006}
+Reich, B., Hodges, J. \& Zadnik, V. (2006) Effects of residual smoothing on the
+  posterior of the fixed effects in disease-mapping models. \emph{Biometrics},
+  \textbf{62}, 1197--1206.
+
+\bibitem[{Royle(2004)}]{Royle2004a}
+Royle, J. (2004) N-mixture models for estimating population size from spatially
+  replicated counts. \emph{Biometrics}, \textbf{60}, 108--115.
+
+\bibitem[{Royle \emph{et~al.}(2004)Royle, Dawson \& Bates}]{Royle2004}
+Royle, J., Dawson, D. \& Bates, S. (2004) Modeling abundance effects in
+  distance sampling. \emph{Ecology}, \textbf{85}, 1591--1597.
+
+\bibitem[{Royle \& Dorazio(2008)}]{Royle2008}
+Royle, J. \& Dorazio, R. (2008) \emph{Hierarchical {M}odeling and {I}nference
+  in {E}cology}. Academic Press, London, U.K.
+
+\bibitem[{Rue \& Held(2005)}]{RueHeld2005}
+Rue, H. \& Held, L. (2005) \emph{Gaussian Markov Random Fields}. Chapman \&
+  Hall/CR, Boca Raton, Florida, USA.
+
+\end{thebibliography}
