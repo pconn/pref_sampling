@@ -30,13 +30,11 @@ Type objective_function<Type>::operator() ()
   
   // ICAR structure
   DATA_SPARSE_MATRIX(Q);
-
-
  
   // Fixed effects
   PARAMETER(logtau_Eta);           // log-inverse SD of Eta
   PARAMETER(logtau_Gamma);        // log-inverse SD of Gamma
-  PARAMETER(beta_pref);    //preferential sampling effect
+  PARAMETER(logtau_Delta);        // log-inverse SD of Delta
   //PARAMETER(logsigma_Epsilon);   
   PARAMETER_VECTOR(betar);
   PARAMETER_VECTOR(betay);
@@ -44,6 +42,7 @@ Type objective_function<Type>::operator() ()
   // Random effects
   PARAMETER_VECTOR(Eta);  // Poisson count spatial random effect
   PARAMETER_VECTOR(Gamma);   // Bernoulli site selection spatial random effect
+  PARAMETER_VECTOR(Delta);  // shared spatial random effect
   //PARAMETER_VECTOR(Epsilon);  //residual error random effect on linear predictor for count model
   
   
@@ -52,8 +51,8 @@ Type objective_function<Type>::operator() ()
   using namespace density; //gives access to multivariate distributions in density.cpp
   Type jnll = 0;
   
-  // Derived quantities related to GMRF.  NOTE: No residual white noise assumed
-
+  
+  //random effects priors
   Type tau_eta = exp(logtau_Eta);
   vector<Type> Tmp = Q*Eta;
   jnll -= Type(0.5)*(n_cells*logtau_Eta-tau_eta*(Eta*Tmp).sum());
@@ -62,27 +61,14 @@ Type objective_function<Type>::operator() ()
   Tmp = Q*Gamma;
   jnll -= Type(0.5)*(n_cells*logtau_Gamma-tau_gamma*(Gamma*Tmp).sum());
   
+  Type tau_delta = exp(logtau_Delta);
+  Tmp = Q*Delta;
+  jnll -= Type(0.5)*(n_cells*logtau_Delta-tau_delta*(Delta*Tmp).sum());
   
   //prior on tau
   jnll -= dgamma(tau_eta,Type(1.0),Type(0.01), true ); 
   jnll -= dgamma(tau_gamma,Type(1.0),Type(0.01), true ); 
-  
-  //}  
-  
-  //Type pi = 3.141592;
-  //vector<Type> Range(3);
-  //for(int r=0; r<Range.size(); r++) Range(r) = sqrt(8) / exp( log_kappa(r) );
-  //Type Sigma_Nu = 1 / sqrt(4*pi*exp(2*logtau_Nu)*exp(2*log_kappa(0)));
-  //Type Sigma_Gamma = 1 / sqrt(4*pi*exp(2*logtau_Gamma)*exp(2*log_kappa(1)));
-  //Type Sigma_Delta = 1 / sqrt(4*pi*exp(2*logtau_Delta)*exp(2*log_kappa(2)));
-
-  // Probability of random fields
-  //Prec =  = exp(log_kappa(0))*G0 + Type(2.0)*exp(2.0*log_kappa(0))*G1 + G2;
-  //jnll += GMRF(Q)(Nu_input);
-  //Q = exp(4.0*log_kappa(1))*G0 + Type(2.0)*exp(2.0*log_kappa(1))*G1 + G2;
-  //jnll += GMRF(Q)(Gamma_input);
-  //Q = exp(4.0*log_kappa(2))*G0 + Type(2.0)*exp(2.0*log_kappa(2))*G1 + G2;
-  //jnll += GMRF(Q)(Delta_input);
+  jnll -= dgamma(tau_delta,Type(1.0),Type(0.01), true ); 
 
   // Derived quantities
   vector<Type> Rpred_i(n_cells);
@@ -91,18 +77,18 @@ Type objective_function<Type>::operator() ()
   
   // Probability of observations
   for(int i=0; i<n_cells; i++){
-    // probability of counts
-    Ypred_i(i) = Log_area_i(i)+Eta(i); // + Delta(i); // + Epsilon(i);
-    for(int c=0; c<ncol_Xy; c++) Ypred_i(i) += Xy(i,c) * betay(c) ;
-    Rpred_i(i) = Gamma(i) + beta_pref*Ypred_i(i);
-    Ypred_i(i) = exp(Ypred_i(i));
-    if( !isNA(Y_i(i)) ) jnll -= dpois( Y_i(i), Prop_sampled_i(i)*Ypred_i(i), true );
-    tot_abund += Ypred_i(i);
     // probability of sampling
-     for(int c=0; c<ncol_Xr; c++) Rpred_i(i) += Xr(i,c) * betar(c);
+    Rpred_i(i) = 0 + Gamma(i) + Delta(i);
+    for(int c=0; c<ncol_Xr; c++) Rpred_i(i) += Xr(i,c) * betar(c);
     Rpred_i(i) = plogis(Rpred_i(i));
     if(R_i(i)==0) jnll -= log( 1-Rpred_i(i) );
     if(R_i(i)==1) jnll -= log( Rpred_i(i) );
+    // probability of counts
+    Ypred_i(i) = Log_area_i(i)+Eta(i) + Delta(i); // + Epsilon(i);
+    for(int c=0; c<ncol_Xy; c++) Ypred_i(i) += Xy(i,c) * betay(c) ;
+    Ypred_i(i) = exp(Ypred_i(i));
+    if( !isNA(Y_i(i)) ) jnll -= dpois( Y_i(i), Prop_sampled_i(i)*Ypred_i(i), true );
+    tot_abund += Ypred_i(i);
   }
   //std::cout<<jnll;
   

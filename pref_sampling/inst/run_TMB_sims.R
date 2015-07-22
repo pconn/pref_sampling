@@ -141,7 +141,7 @@ for(isamp in 1:2){  #sampling intensity
           Xr = model.matrix(~1,data=Grid@data)
           Xy = model.matrix(~cov1+cov2+cov1.quad+cov2.quad+cov12,data=Grid@data) 
         }
-        Data=list("n_cells"=S,"n_transects"=length(Effort$Counts),"ncol_Xr"=ncol(Xr), "ncol_Xy"=ncol(Xy), "R_i"=R, "Y_i"=Y, "Log_area_i"=log(Area.adjust),"Prop_sampled_i"=Offset,"Xr"=Xr, "Xy"=Xy, "Q1"=Q, "Q2"=Q,"Q3"=Q)
+        Data=list("n_cells"=S,"n_transects"=length(Effort$Counts),"ncol_Xr"=ncol(Xr), "ncol_Xy"=ncol(Xy), "R_i"=R, "Y_i"=Y, "Log_area_i"=log(Area.adjust),"Prop_sampled_i"=Offset,"Xr"=Xr, "Xy"=Xy, "Q"=Q)
         
         for(iest in c(1,2,4,5)){
           counter=counter+1
@@ -212,23 +212,24 @@ for(isamp in 1:2){  #sampling intensity
             opt[["AIC"]] = 2*opt$objective + 2*length(opt$par)
             #opt[["BIC"]] = 2*opt$objective + length(opt$par) * log(n.transects)
             
-            # Diagnostics
+             # Diagnostics
             na=0
             if(length(Random)>0){
               Report=sdreport(obj,bias.correct=TRUE)
               Random=summary(Report,"random")
               if(sum(is.na(Random[,2]))>0)na=1
+              n.hat=Report$unbiased$value
             }
             else{
               Report=sdreport(obj)
+              n.hat=Report$value
             }
             Fixed=summary(Report,"fixed")
             
-             if(sum(is.na(Fixed[,2]))>0)na=1
+            if(sum(is.na(Fixed[,2]))>0)na=1
             
             Report2 = obj$report()
             
-            n.hat=Report$value
             n.se=Report$sd
             n.true=sum(Grid[["N"]])
             
