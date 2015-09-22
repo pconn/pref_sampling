@@ -6,7 +6,8 @@ library( RandomFields )
 library( TMB )
 library( INLA )
 
-Version = "simple_v1"
+Version = "simple_v2"
+# v2 -- added option for changing distribution for random effects, and implemented ICAR distribution
 
 # Compile
 TmbFile = "C:/Users/James.Thorson/Desktop/Project_git/pref_sampling/TMB_version/inst/executables"
@@ -20,9 +21,20 @@ SpatialScale = sqrt(prod(grid_dim))/5  # Range ~ 2*Scale
 SD_Nu = 1
 betay = 2
 Use_REML = TRUE
+Spatial_model = c("ICAR","SPDE_GMRF")[1]
+
+# Derived
+Options_vec = c( 'Prior'=switch(Spatial_model,"ICAR"=1,"SPDE_GMRF"=0) )
+
+# Source ICAR precision matrix function
+source( paste0(TmbFile,"/../../examples/rect_adj.R") )
+Q = rect_adj( x=grid_dim['x'], y=grid_dim['y'] )
+Q = -1*Q
+diag(Q) = -1 * colSums(Q)
+# Sigma = solve(Q)   # Appears to be singular
 
 # Results
-Results = array(NA, dim=c(100,5), dimnames=list(NULL,c("betay","Sigma_Nu","Range_Nu","sum_Ztrue","sum_Zpred")) )
+Results = array(NA, dim=c(500,5), dimnames=list(NULL,c("betay","Sigma_Nu","Range_Nu","sum_Ztrue","sum_Zpred")) )
 
 # Lop through replicates
 for(i in 1:nrow(Results)){

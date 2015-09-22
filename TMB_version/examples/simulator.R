@@ -21,8 +21,8 @@ n_stations = 200
 SpatialScale = 0.25
   Range = optimize( f=function(n){ abs(dnorm(n,0,SpatialScale)/dnorm(0,0,SpatialScale)-0.1) }, interval=c(0,1))$minimum  # distance with 10% corr
 SD_Nu = 0.5     # Count
-SD_Gamma = 0.5  # Sampling intensity
-SD_Delta = 1    # Shared
+SD_Gamma = 0   # Sampling intensity
+SD_Delta = 0    # Shared
 betay = 2
 betar = 0
 
