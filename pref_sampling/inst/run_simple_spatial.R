@@ -20,7 +20,7 @@ library( INLA )
 
 COMPILE=FALSE
 SIM=T
-prop.sampled=0.05
+prop.sampled=0.1
 n.transects=90
 
 
@@ -72,6 +72,7 @@ if(SIM){
 
 set.seed(423456)
 for(isim in 1:n.sims){
+  cat(paste("isim",isim,"\n"))
   counter=0
   Cur.file=paste("./Sim_data/Effort_bal_high",isim,".Rda",sep='')
   load(Cur.file) #load Effort 
@@ -90,7 +91,6 @@ for(isim in 1:n.sims){
   
   
   #### Unconditional spec
-  
   TmbFile="./TMB_version/inst/executables/spatial_only"
   dyn.load(dynlib(TmbFile))
   
@@ -142,13 +142,15 @@ for(isim in 1:n.sims){
   
   
   ###########  alternative formulation using Hodges & Reich Eqn 3
+  diag(Data$Q)=diag(Data$Q)-0.01
   
   TmbFile="./TMB_version/inst/executables/spatial_only_skaug"
   dyn.load(dynlib(TmbFile))
   
   Map = list()  #specify fixed parameter values
   
-  Params = list("logtau_Eta"=log(1),"Beta"=0,"Eta"=rep(0,S))
+  #Params = list("logtau_Eta"=log(1),"Beta"=0,"Eta"=rep(0,S))
+  Params=list("logtau_Eta"=log(1),"Eta"=rep(0,S))
   Random=c("Eta")  #specify which params are random effects
   #Map[["beta_pref"]] = factor( NA )
   
@@ -210,7 +212,7 @@ for(isim in 1:n.sims){
   n.inla.mean=sum(Out.inla$summary.fitted[,"mean"])
   n.inla.median=sum(Out.inla$summary.fitted[,"0.5quant"])
   
-  Result[isim,]=c(imod,isamp,icov,iest,isim,n.hat2,n.true,n.se,sum(abs(Report2$Ypred_i-Grid[["N"]]))/n.true,na,n.inla.mean)
+  Result[isim,]=c(1,1,1,1,isim,n.hat2,n.true,n.se2,sum(abs(Report2$Ypred_i-Grid[["N"]]))/n.true,na,n.inla.mean)
   
 }
 prop.sampled

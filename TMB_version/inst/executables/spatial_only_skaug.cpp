@@ -31,7 +31,7 @@ Type objective_function<Type>::operator() ()
   // Fixed effects
   PARAMETER(logtau_Eta);           // log-inverse SD of Eta
 
-  PARAMETER_VECTOR(Beta);
+  //PARAMETER_VECTOR(Beta); //(run without since ICAR rank deficient by 1)
 
   // Random effects
   PARAMETER_VECTOR(Eta);  // random effects  
@@ -45,7 +45,7 @@ Type objective_function<Type>::operator() ()
   // ICAR prior
   Type tau = exp(logtau_Eta);
   vector<Type> Tmp = Q*Eta;
-  jnll -= Type(0.5)*(n_cells*logtau_Eta-tau*(Eta*Tmp).sum());
+  jnll -= Type(0.5)*((n_cells-1)*logtau_Eta-tau*(Eta*Tmp).sum());
 
   //vector<Type> Eta = Tmp/tau;       // Doing the scaling as a post-step. 100% OK!!
 
@@ -60,7 +60,7 @@ Type objective_function<Type>::operator() ()
   for(int i=0; i<n_cells; i++){
     // probability of counts
     Ypred_i(i) = Log_area_i(i)+Eta(i);
-    for(int c=0; c<ncol_X; c++) Ypred_i(i) += X(i,c) * Beta(c) ;
+    //for(int c=0; c<ncol_X; c++) Ypred_i(i) += X(i,c) * Beta(c) ; //run without intercept temporarily
     Ypred_i(i) = exp(Ypred_i(i));
     if( !isNA(Y_i(i)) ) jnll -= dpois( Y_i(i), Prop_sampled_i(i)*Ypred_i(i), true );
     tot_abund += Ypred_i(i);

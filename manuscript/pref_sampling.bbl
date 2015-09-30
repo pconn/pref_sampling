@@ -1,4 +1,4 @@
-\begin{thebibliography}{25}
+\begin{thebibliography}{26}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
@@ -10,9 +10,9 @@
 
 \bibitem[{Banerjee \emph{et~al.}(2008)Banerjee, Gelfand, Finley \&
   Sang}]{BanerjeeEtAl2008}
-Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Gaussian
-  predictive process models for large spatial datasets. \emph{Journal of the
-  Royal Statistical Society B}, \textbf{70}, 825--848.
+Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Stationary process
+  approximation for the analysis of large spatial datasets. \emph{Journal of
+  the Royal Statistical Society B}, \textbf{70}, 825--848.
 
 \bibitem[{Borchers \emph{et~al.}(2006)Borchers, Laake, Southwell \&
   Paxton}]{Borchers2006}
@@ -129,6 +129,11 @@ Pati, D., Reich, B.J. \& Dunson, D.B. (2011) Bayesian geostatistical modelling
 Reich, B., Hodges, J. \& Zadnik, V. (2006) Effects of residual smoothing on the
   posterior of the fixed effects in disease-mapping models. \emph{Biometrics},
   \textbf{62}, 1197--1206.
+
+\bibitem[{Royle \& Berliner(1999)}]{RoyleBerliner1999}
+Royle, J.A. \& Berliner, L.M. (1999) A hierarchical approach to multivariate
+  spatial modeling and prediction. \emph{Journal of Agricultural, Biological,
+  and Environmental Statistics}, \textbf{4}, 29--56.
 
 \bibitem[{Royle(2004)}]{Royle2004a}
 Royle, J. (2004) N-mixture models for estimating population size from spatially
