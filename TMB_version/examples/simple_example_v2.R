@@ -24,9 +24,15 @@ n_samp = 50
 SpatialScale = sqrt(prod(grid_dim))/5  # Range ~ 2*Scale
 SD_Nu = 1
 betay = 2
+<<<<<<< HEAD
 Use_REML = FALSE
 Spatial_model_set = c("SPDE_GMRF", "ICAR")[2]
 Spatial_sim_model = c("GP_gaussian", "ICAR")[2]
+=======
+Use_REML = TRUE
+Spatial_sim_model = c("GP_gaussian", "ICAR")[1]
+Spatial_model_set = c("SPDE_GMRF", "ICAR")[1:2]
+>>>>>>> 878ed302f089be797086cd504d8ff21ef2397795
 
 # Source ICAR precision matrix function
 Q = rect_adj( x=grid_dim['x'], y=grid_dim['y'] )
@@ -110,6 +116,8 @@ for(i in 1:dim(Results)[2]){
     # Record
     Results[Spatial_model,i,c("betay","Sigma_Nu","Range_Nu","sum_Ztrue","sum_Zpred")] = c( NA, Report$MargSD, Report$Range, sum(Ztrue_s), SD$unbiased$value['total_abundance'] )
     if( Use_REML==TRUE ) Results[Spatial_model,i,'betay'] = SD$unbiased$value['beta_j']
+
+    dyn.unload( dynlib(Version) )
   }
   
   # output
