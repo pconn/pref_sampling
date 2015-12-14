@@ -1,4 +1,4 @@
-\begin{thebibliography}{26}
+\begin{thebibliography}{30}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
@@ -10,9 +10,9 @@
 
 \bibitem[{Banerjee \emph{et~al.}(2008)Banerjee, Gelfand, Finley \&
   Sang}]{BanerjeeEtAl2008}
-Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Stationary process
-  approximation for the analysis of large spatial datasets. \emph{Journal of
-  the Royal Statistical Society B}, \textbf{70}, 825--848.
+Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Gaussian
+  predictive process models for large spatial datasets. \emph{Journal of the
+  Royal Statistical Society B}, \textbf{70}, 825--848.
 
 \bibitem[{Borchers \emph{et~al.}(2006)Borchers, Laake, Southwell \&
   Paxton}]{Borchers2006}
@@ -46,6 +46,11 @@ Conn, P.B., Ver~Hoef, J.M., McClintock, B.T., Moreland, E.E., London, J.M.,
 \bibitem[{Cressie(1993)}]{Cressie1993}
 Cressie, N.A.C. (1993) \emph{Statistics for spatial data, revised edition.}
   Wiley, New York.
+
+\bibitem[{Dail \& Madsen(2011)}]{DailMadsen2011}
+Dail, D. \& Madsen, L. (2011) Models for estimating abundance from repeated
+  counts of an open metapopulation. \emph{Biometrics}, \textbf{67}(2),
+  577--587.
 
 \bibitem[{Diggle \emph{et~al.}(1998)Diggle, Tawn \& Moyeed}]{DiggleEtAl1998}
 Diggle, P.J., Tawn, J.A. \& Moyeed, R.A. (1998) Model-based geostatistics.
@@ -85,6 +90,11 @@ Johnson, D.S., Conn, P.B., Hooten, M., Ray, J. \& Pond, B. (2013) A probit
 Johnson, D., Laake, J. \& Ver~Hoef, J. (2010) A model-based approach for making
   ecological inference from distance sampling data. \emph{Biometrics},
   \textbf{66}, 310--318.
+
+\bibitem[{Kristensen \emph{et~al.}(2015)Kristensen, Nielsen \&
+  Berg}]{KristensenEtAl2015}
+Kristensen, K., Nielsen, A. \& Berg, C.W. (2015) Template {M}odel {B}uilder
+  tmb. \emph{Journal of Statistical Software}, In Press.
 
 \bibitem[{Latimer \emph{et~al.}(2009)Latimer, Banerjee, Sang, Moshner \&
   Silander~Jr.}]{LatimerEtAl2009}
@@ -150,5 +160,16 @@ Royle, J. \& Dorazio, R. (2008) \emph{Hierarchical {M}odeling and {I}nference
 \bibitem[{Rue \& Held(2005)}]{RueHeld2005}
 Rue, H. \& Held, L. (2005) \emph{Gaussian Markov Random Fields}. Chapman \&
   Hall/CR, Boca Raton, Florida, USA.
+
+\bibitem[{Thorson \& Kristensen(In Press)}]{ThorsonKristensenInPress}
+Thorson, J.T. \& Kristensen, K. (In Press) Implementing a generic method for
+  bias correction in statistical models using random effects, with spatial and
+  popualtion dynamics examples. \emph{Fisheries Research}.
+
+\bibitem[{Tierney \emph{et~al.}(1989)Tierney, Kass \& Kadane}]{TierneyEtAl1989}
+Tierney, L., Kass, R.E. \& Kadane, J.B. (1989) Fully exponential {L}aplace
+  approximations to expectations and vvariance of non positive functions.
+  \emph{Journal of the American Statistical Association}, \textbf{84},
+  710--716.
 
 \end{thebibliography}
