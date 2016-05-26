@@ -113,19 +113,23 @@ d_biv_normal<-function(Tmp.vec,XY,Sigma){
   
 #' Function to plot abundance map for Bering Sea survey grid
 #' @param cur.t  Time step to plot map for
-#' @param N A matrix holding abundance point estimates; different rows correspond to different sampling units, columns correspond to time step
-#' @param Grid A list object, each element of which holds a spatial polygons data frame for each time step
+#' @param N A matrix holding abundance point estimates; different rows correspond to different sampling units
+#' @param Grid A spatial polygons data frame holding grid entries
 #' @param highlight If provided, this vector specifies which cells to separately highlight during plotting
 #' @param cell.width if highlight is provided, cell.width must provide the width of a composite grid cell
 #' @param leg.title Title for legend of plot (if different from the default "Abundance")
 #' @param hcolor If highight provided, gives color for highlighting (default = "yellow")
 #' @param cur.max If provided, sets maximum value for plotted abundance
+#' @param myPallete A colorRampPalette; default is a spectral palette from RColorBrewer
 #' @return An abundance map
 #' @export 
 #' @keywords abundance map, plot
 #' @author Paul Conn \email{paul.conn@@noaa.gov}
-plot_N_map<-function(N,Grid,highlight=NULL,cell.width=1,leg.title="Abundance",hcolor='yellow',cur.max=NULL){
-  myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))  
+plot_N_map<-function(cur.t=1,N,Grid,highlight=NULL,cell.width=1,leg.title="Abundance",hcolor='yellow',cur.max=NULL,myPalette=NULL){
+  require(ggplot2)
+  require(rgeos)
+  require(RColorBrewer)
+  if(is.null(myPalette)==TRUE)myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))  
   Tmp=Grid
   if(is.null(highlight)==FALSE){
     midpoints=data.frame(gCentroid(Tmp[highlight,],byid=TRUE))

@@ -26,7 +26,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-\begin{center} \bf {\large Confronting preferential sampling in count and occupancy surveys: diagnosis and model-based triage}
+\begin{center} \bf {\large Confronting preferential sampling in wildlife surveys: diagnosis and model-based triage}
 
 \vspace{0.7cm}
 Paul B. Conn$^{1,*}$, James T. Thorson$^2$, Devin S. Johnson$^1$
@@ -62,8 +62,8 @@ In this appendix, we provide further details on model development, implementatio
 
 \subsubsection*{Preferential sampling model development}
 
-We focus here on a discrete spatial domain; extensions to point process models in continuous space are relatively straightforward.  In particular, we suppose that the investigator intending to fit a SDM to animal encounter data breaks their study area up into $S$ survey units (label these $U_1, U_2, \hdots, U_S$), of which $n$ are selected for sampling (call the set of sampled locations $\mathcal{S}$). 
-Each survey unit $i$ is assigned a vector of covariates, ${\bf x}_i$, and an indicator $R_i$ that takes on the value 1.0 if survey unit $i$ is sampled (i.e. if $U_i \in \mathcal{S}$), and is 0 otherwise.  Let $Z_i$ denote the state variable of interest in cell $i$ (e.g., occupancy, abundance), and let $Y_i$ denote observations made in cell $i$.  In some cases, observations may be equivalent to the state variable in sampled cells (i.e. when detection probability is 1.0).  In others, an observation model $[Y_i | Z_i, \boldsymbol{\theta}]$ relating $Y_i$ to the underlying process of interest will be required, where $\boldsymbol{\theta}$ are nuisance parameters describing detection.  For instance, for survey counts in our simulation study and in the bearded seal example, we set 
+We focus here on a discrete spatial domain; extensions to point process models in continuous space should be relatively straightforward.  In particular, we suppose that the investigator intending to fit a SDM to animal encounter data breaks their study area up into $S$ survey units (label these $U_1, U_2, \hdots, U_S$), of which $n$ are selected for sampling (call the set of sampled locations $\mathcal{S}$).
+Each survey unit $i$ is assigned a vector of covariates, ${\bf x}_i$, and an indicator $R_i$ that takes on the value 1.0 if survey unit $i$ is sampled (i.e. if $U_i \in \mathcal{S}$), and is 0 otherwise.  Let $Z_i$ denote the state variable of interest in cell $i$ (e.g., occupancy, abundance), and let $Y_i$ denote observations made in cell $i$.  In some cases, observations may be equivalent to the state variable in sampled cells (i.e. when detection probability is 1.0).  In others, an observation model $[Y_i | Z_i, \boldsymbol{\theta}]$ relating $Y_i$ to the underlying process of interest will be required, where $\boldsymbol{\theta}$ are nuisance parameters describing detection.  For instance, for survey counts in our simulation study and in the bearded seal example, we set
 \begin{eqnarray*}
   [Y_i | Z_i, \boldsymbol{\theta}] & = & \textrm{Binomial}(Z_i, A_i p_i),
 \end{eqnarray*}
@@ -76,10 +76,10 @@ where $A_i$ gives the proportion of survey unit $i$ that is sampled and $p_i$ is
 \end{eqnarray}
 where $f()$ is a probability mass function (e.g., Poisson for count data, Bernoulli for occupancy), $g()$ is a link function (e.g. probit or logit for occupancy, log for count data), and $\mu_i$ is a link-scale intensity value.  In applications described in this paper, we specify this intensity as
 \begin{eqnarray}
-\mu_i & = & \beta_0 + {\bf x}_i \boldsymbol{\beta}+\lambda_i,
+\mu_i & = & \beta_0 + {\bf x}_i \boldsymbol{\beta}+\delta_i,
  \label{eq:mu}
 \end{eqnarray}
-where $\beta_0$ is an intercept, ${\bf x}_i$ is a vector of covariates used to explain variation in abundance (here indexed by the site, $i$), and $\boldsymbol{\lambda}=\{ \lambda_1,\lambda_2,\hdots,\lambda_S \}$ are spatially autocorrelated random effects.
+where $\beta_0$ is an intercept, ${\bf x}_i$ is a vector of covariates used to explain variation in abundance (here indexed by the site, $i$), and $\boldsymbol{\delta}=\{ \delta_1,\delta_2,\hdots,\delta_S \}$ are spatially autocorrelated random effects.
 
 \hspace{0.5in} We model the site selection probabilities in the same manner.  First, we write $R_i$, as
 \begin{eqnarray}
@@ -92,16 +92,16 @@ where $h()$ denotes a link function appropriate for binary data (e.g. logit, pro
   \nu_i & = & \beta_0^* + {\bf x}_i^* \boldsymbol{\beta}^*+\eta_i+{\bf B} \delta_i.
 \label{eq:nu}
 \end{eqnarray}
-Here, $\beta_0^*$ is an intercept, ${\bf x}_i^*$ is a vector of covariates (in practice, these can be the same or different from ${\bf x}_i$), and $\boldsymbol{\eta}=\{ \eta_1,\eta_2,\hdots,\eta_S \}$ are spatially autocorrelated random effects.  The connection between the two models (eqs. \ref{eq:mu} and \ref{eq:nu}) is the reliance of both on $\delta_i$.  In eq. \ref{eq:nu}, the matrix ${\bf B}$ describes this relationship.  Previous preferential sampling models in the statistical literature have set $\textbf{B} = b \textbf{I}$, where $\textbf{I}$ is an identity matrix and $b$ is a parameter to be estimated.  This is the approach we take in simulation study and in several of the models fit to real data.  Another approach is to construct $\textbf{B}$ so it changes smoothly in space, as in \citep{RoyleBerliner1999}.  In this manner, the degree of preferential sampling could vary across the landscape; presumably, one would need fairly rich data to be able to model a spatially varying relationship.  
+Here, $\beta_0^*$ is an intercept, ${\bf x}_i^*$ is a vector of covariates (in practice, these can be the same or different from ${\bf x}_i$), and $\boldsymbol{\eta}=\{ \eta_1,\eta_2,\hdots,\eta_S \}$ are spatially autocorrelated random effects.  The connection between the two models (eqs. \ref{eq:mu} and \ref{eq:nu}) is the reliance of both on $\delta_i$.  In eq. \ref{eq:nu}, the matrix ${\bf B}$ describes this relationship.  Previous preferential sampling models in the statistical literature have set $\textbf{B} = b \textbf{I}$, where $\textbf{I}$ is an identity matrix and $b$ is a parameter to be estimated.  This is the approach we take in simulation study and in several of the models fit to real data.  Another approach is to construct $\textbf{B}$ so it changes smoothly in space, as in \citep{RoyleBerliner1999}.  In this manner, the degree of preferential sampling could vary across the landscape; presumably, one would need fairly rich data to be able to model a spatially varying relationship.
 
-\hspace{0.5in} We have yet to specify a model for spatial autocorrelation.  For analyses in this paper, we model mean-zero spatial random effects (i.e., the $\lambda_i$ and $\eta_i$) for each site $i$ as multivariate normal:
+\hspace{0.5in} We have yet to specify a model for spatial autocorrelation.  For analyses in this paper, we model mean-zero spatial random effects (i.e., the $\delta_i$ and $\eta_i$) for each site $i$ as multivariate normal:
 \begin{eqnarray*}
-  \boldsymbol{\lambda} & \sim & MVN(\textbf{0},\boldsymbol{\Sigma}_{\lambda}), \text{ and} \\
+  \boldsymbol{\lambda} & \sim & MVN(\textbf{0},\boldsymbol{\Sigma}_{\delta}), \text{ and} \\
   \boldsymbol{\eta} & \sim & MVN(\textbf{0},\boldsymbol{\Sigma}_{\eta}),
 \end{eqnarray*}
-where $\boldsymbol{\Sigma}_{\lambda}$ and $\boldsymbol{\Sigma}_{\eta}$ are covariance matrices.  As is typical of spatial models in statistics, we allow the magnitude of spatial autocorrelation to decrease as a function of the distance between survey units.  In particular, we use the well known Mat\'{e}rn covariance function to model covariance as a function of distance.  In addition to the distances between survey units (which we calculate relative to survey unit centroids), the Mat\'{e}rn covariance function uses a range (or scale) parameter $\kappa$, a precision parameter $\tau$ (inverse marginal variance), and a smoothness parameter to model covariance.  For analyses in this paper, we set the smoothness parameter to 1.0 and treat $\kappa$ and $\tau$ as parameters to be estimated.  To improve computational efficiency, we use a Gaussian Markov random field (GMRF) representation of the underlying Gaussian field \citep{LindgrenEtAl2011}, as described by \citet{ThorsonEtAl2015} (Appendix B).  
+where $\boldsymbol{\Sigma}_{\lambda}$ and $\boldsymbol{\Sigma}_{\eta}$ are covariance matrices.  As is typical of spatial models in statistics, we allow the magnitude of spatial autocorrelation to decrease as a function of the distance between survey units.  In particular, we use the well known Mat\'{e}rn covariance function to model covariance as a function of distance.  In addition to the distances between survey units (which we calculate relative to survey unit centroids), the Mat\'{e}rn covariance function uses a range (or scale) parameter $\kappa$, a precision parameter $\tau$ (inverse marginal variance), and a smoothness parameter to model covariance.  For analyses in this paper, we set the smoothness parameter to 1.0 and treat $\kappa$ and $\tau$ as parameters to be estimated.  To improve computational efficiency, we use a Gaussian Markov random field (GMRF) representation of the underlying Gaussian field \citep{LindgrenEtAl2011}, as described by \citet{ThorsonEtAl2015} (Appendix B).
 
-To conduct statistical analysis of the preceding models, we use maximum marginal likelihood as implemented in Template Model Builder \citep[TMB; ][]{KristensenEtAl2015}. Interfaced with the R programming environment, the TMB software uses a Laplace approximation to integrate out random effects, and a bias correction algorithm \citep{TierneyEtAl1989,ThorsonKristensenInPress} is used to obtain abundance estimates and standard errors that properly account for nonlinear transformations of random effects.  Requisite R and TMB code will be published to a publicly accessible repository upon acceptance, and is also available at \url{https://github.com/NMML/pref_sampling/}.
+\hspace{0.5in} To conduct statistical analysis of the preceding models, we use maximum marginal likelihood as implemented in Template Model Builder \citep[TMB; ][]{KristensenEtAl2015}. Interfaced with the R programming environment, the TMB software uses a Laplace approximation to integrate out random effects, and a bias correction algorithm \citep{TierneyEtAl1989,ThorsonKristensenInPress} is used to obtain abundance estimates and standard errors that properly account for nonlinear transformations of random effects.  Requisite R and TMB code will be published to a publicly accessible repository upon acceptance, and is also available at \url{https://github.com/NMML/pref_sampling/}.
 
 \subsubsection*{Simulation study details}
 
@@ -121,16 +121,16 @@ For each of 500 simulations, we performed the following steps:
       where the $\boldsymbol{\delta}$ are drawn in an identical manner to $\textbf{X}$ in step 1.  We set $\beta_0 = 2.0$ and drew $\beta_1 \sim \textrm{Uniform}(-0.5,0.5)$ for each simulation.
   \item For each simulation, we selected 50 grid cells for sampling (i.e., set $R_i = 1.0$) according to 3 alternative survey configurations.  Each survey configuration, grid cells were drawn randomly without replacement, where the probability of sampling cell $i$ is proportional to
       \begin{equation*}
-        \exp(X_i \beta_1^*  + \eta_i + b*\delta_i).
-      \end{equation*}      
+        \exp(X_i \beta_1^*  + \eta_i + b \delta_i).
+      \end{equation*}
       Here, $\eta_i$ is a spatially autocorrelated random effect drawn in an identical manner to $\textbf{X}$ in step 1, and $b$ describes the level of preferential sampling.  Three levels are used: $b=0$, which makes the sampling model conditionally independent from the abundance process (i.e., no preferential sampling); $b=1$, which induces some dependence between the abundance and sampling process (i.e., moderate preferential sampling); $b=5$ which makes cells of high abundance much more likely to be sampled than low abundance cells (i.e., pathological preferential sampling).   We drew $\beta_1^* \sim \textrm{Uniform}(-0.5,0.5)$ for each simulation replicate.  An illustration of the consequences of different survey configurations is provided in Fig. 2 of the main manuscript.
-  \item For each of the 3 sampling configurations, we generated a count dataset.  In each case, we generated a count $Y_i$ for each cell selected for sampling (i.e., for cells where $R_i=1.0$) according to 
+  \item For each of the 3 sampling configurations, we generated a count dataset.  In each case, we generated a count $Y_i$ for each cell selected for sampling (i.e., for cells where $R_i=1.0$) according to
       \begin{eqnarray*}
         Y_i & \sim & \textrm{Binomial}(N_i,A).
       \end{eqnarray*}
       Here, $A$ represents the portion of the grid cell that is surveyed, and was set to 0.5 for all simulations and grid cells.
   \item For each count data set, we fitted 2 different estimation models in TMB (see \textit{Preferential sampling model development}).  In the first, the preferential sampling parameter $b$ was fixed to 0.0 (thus in effect assuming no preferential sampling).  In the second, $b$ was estimated.
-  \item For each combination of simulation replicate, survey configuration, and estimation model, we recorded relative bias with respect to total estimated abundance, $\hat{N} = \sum \hat{N_i}$, where a bias correction algorithm \citep{TierneyEtAl1989,ThorsonKristensenInPress} is used to obtain abundance estimates and standard errors that properly account for nonlinear transformations of random effects.
+  \item For each combination of simulation replicate, survey configuration, and estimation model, we recorded relative bias with respect to total estimated abundance, $\hat{N} = \sum \hat{N_i}$, where a bias correction algorithm \citep{TierneyEtAl1989,ThorsonKristensenInPress} is used to obtain abundance estimates and standard errors that properly account for nonlinear transformations of random effects.  This bias correction is also used to obtain abundance estimates in the bearded seal example
 \end{enumerate}
 
 

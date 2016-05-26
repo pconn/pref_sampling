@@ -1,4 +1,4 @@
-\begin{thebibliography}{30}
+\begin{thebibliography}{33}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
@@ -10,9 +10,9 @@
 
 \bibitem[{Banerjee \emph{et~al.}(2008)Banerjee, Gelfand, Finley \&
   Sang}]{BanerjeeEtAl2008}
-Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Gaussian
-  predictive process models for large spatial datasets. \emph{Journal of the
-  Royal Statistical Society B}, \textbf{70}, 825--848.
+Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Stationary process
+  approximation for the analysis of large spatial datasets. \emph{Journal of
+  the Royal Statistical Society B}, \textbf{70}, 825--848.
 
 \bibitem[{Borchers \emph{et~al.}(2006)Borchers, Laake, Southwell \&
   Paxton}]{Borchers2006}
@@ -22,9 +22,9 @@ Borchers, D.L., Laake, J.L., Southwell, C. \& Paxton, C.G.M. (2006)
 
 \bibitem[{Buckland \emph{et~al.}(2001)Buckland, Anderson, Burnham, Laake,
   Borchers \& Thomas}]{BucklandEtAl2001}
-Buckland, S., Anderson, D., Burnham, K., Laake, J., Borchers, D. \& Thomas, L.
-  (2001) \emph{Introduction to Distance Sampling: Estimating the abundance of
-  biological populations}. Oxford University Press, Oxford, U.K.
+Buckland, S.T., Anderson, D.R., Burnham, K.P., Laake, J.L., Borchers, D.L. \&
+  Thomas, L. (2001) \emph{Introduction to Distance Sampling: Estimating the
+  abundance of biological populations}. Oxford University Press, Oxford, U.K.
 
 \bibitem[{Chakraborty \emph{et~al.}(2010)Chakraborty, Gelfand, Wilson, Latimer
   \& Silander~Jr}]{ChakrabortyEtAl2010}
@@ -34,6 +34,13 @@ Chakraborty, A., Gelfand, A.E., Wilson, A.M., Latimer, A.M. \& Silander~Jr,
 
 \bibitem[{Cochran(1977)}]{Cochran1977}
 Cochran, W. (1977) \emph{Sampling Techniques, 3rd Edition}. Wiley, New York.
+
+\bibitem[{Conn \emph{et~al.}(2015)Conn, Johnson, Ver~Hoef, Hooten, London \&
+  Boveng}]{ConnEtAl2015}
+Conn, P.B., Johnson, D.S., Ver~Hoef, J.M., Hooten, M.B., London, J.M. \&
+  Boveng, P.L. (2015) Using spatio-temporal statistical models to estimate
+  animal abundance and infer ecological dynamics from survey counts.
+  \emph{Ecological Monographs}, \textbf{85}, 235--252.
 
 \bibitem[{Conn \emph{et~al.}(2014)Conn, Ver~Hoef, McClintock, Moreland, London,
   Cameron, Dahle \& Boveng}]{ConnEtAl2014}
@@ -70,9 +77,9 @@ Elith, J. \& Leathwick, J.R. (2009) Species distribution models: ecological
   Ecology, Evolution, and Systematics}, \textbf{40}, 677--697.
 
 \bibitem[{Hedley \& Buckland(2004)}]{HedleyBuckland2004}
-Hedley, S. \& Buckland, S. (2004) Spatial models for line transect sampling.
-  \emph{Journal of Agricultural, Biological, and Environmental Statistics},
-  \textbf{9}, 181--199.
+Hedley, S.L. \& Buckland, S.T. (2004) Spatial models for line transect
+  sampling. \emph{Journal of Agricultural, Biological, and Environmental
+  Statistics}, \textbf{9}, 181--199.
 
 \bibitem[{Hughes \& Haran(2013)}]{Hughes2013}
 Hughes, J. \& Haran, M. (2013) Dimension reduction and alleviation of
@@ -87,8 +94,8 @@ Johnson, D.S., Conn, P.B., Hooten, M., Ray, J. \& Pond, B. (2013) A probit
 
 \bibitem[{Johnson \emph{et~al.}(2010)Johnson, Laake \&
   Ver~Hoef}]{JohnsonEtAl2010}
-Johnson, D., Laake, J. \& Ver~Hoef, J. (2010) A model-based approach for making
-  ecological inference from distance sampling data. \emph{Biometrics},
+Johnson, D.S., Laake, J.L. \& Ver~Hoef, J.M. (2010) A model-based approach for
+  making ecological inference from distance sampling data. \emph{Biometrics},
   \textbf{66}, 310--318.
 
 \bibitem[{Kristensen \emph{et~al.}(2015)Kristensen, Nielsen \&
@@ -105,9 +112,9 @@ Latimer, A.M., Banerjee, S., Sang, H., Moshner, E.S. \& Silander~Jr., J.A.
 
 \bibitem[{MacKenzie \emph{et~al.}(2002)MacKenzie, Nichols, Lachman, Droege,
   Royle \& Langtimm}]{MacKenzie2002}
-MacKenzie, D., Nichols, J., Lachman, G., Droege, S., Royle, J. \& Langtimm, C.
-  (2002) Estimating site occupancy rates when detection probabilities are less
-  than one. \emph{Ecology}, \textbf{83}, 2248--2255.
+MacKenzie, D.I., Nichols, J.D., Lachman, G.B., Droege, S., Royle, J.A. \&
+  Langtimm, C.A. (2002) Estimating site occupancy rates when detection
+  probabilities are less than one. \emph{Ecology}, \textbf{83}, 2248--2255.
 
 \bibitem[{Manceur \& K{\"u}hn(2014)}]{ManceurKuhn2014}
 Manceur, A.M. \& K{\"u}hn, I. (2014) Inferring model-based probability of
@@ -135,27 +142,34 @@ Pati, D., Reich, B.J. \& Dunson, D.B. (2011) Bayesian geostatistical modelling
   with informative sampling locations. \emph{Biometrika}, \textbf{98}(1),
   35--48.
 
+\bibitem[{Phillips \emph{et~al.}(2009)Phillips, Dud{\'\i}k, Elith, Graham,
+  Lehmann, Leathwick \& Ferrier}]{PhillipsEtAl2009}
+Phillips, S.J., Dud{\'\i}k, M., Elith, J., Graham, C.H., Lehmann, A.,
+  Leathwick, J. \& Ferrier, S. (2009) Sample selection bias and presence-only
+  distribution models: implications for background and pseudo-absence data.
+  \emph{Ecological Applications}, \textbf{19}(1), 181--197.
+
 \bibitem[{Reich \emph{et~al.}(2006)Reich, Hodges \& Zadnik}]{Reich2006}
-Reich, B., Hodges, J. \& Zadnik, V. (2006) Effects of residual smoothing on the
-  posterior of the fixed effects in disease-mapping models. \emph{Biometrics},
-  \textbf{62}, 1197--1206.
+Reich, B.J., Hodges, J.S. \& Zadnik, V. (2006) Effects of residual smoothing on
+  the posterior of the fixed effects in disease-mapping models.
+  \emph{Biometrics}, \textbf{62}, 1197--1206.
+
+\bibitem[{Royle(2004)}]{Royle2004a}
+Royle, J.A. (2004) N-mixture models for estimating population size from
+  spatially replicated counts. \emph{Biometrics}, \textbf{60}, 108--115.
+
+\bibitem[{Royle \emph{et~al.}(2004)Royle, Dawson \& Bates}]{Royle2004}
+Royle, J.A., Dawson, D.K. \& Bates, S. (2004) Modeling abundance effects in
+  distance sampling. \emph{Ecology}, \textbf{85}, 1591--1597.
+
+\bibitem[{Royle \& Dorazio(2008)}]{Royle2008}
+Royle, J.A. \& Dorazio, R.M. (2008) \emph{Hierarchical {M}odeling and
+  {I}nference in {E}cology}. Academic Press, London, U.K.
 
 \bibitem[{Royle \& Berliner(1999)}]{RoyleBerliner1999}
 Royle, J.A. \& Berliner, L.M. (1999) A hierarchical approach to multivariate
   spatial modeling and prediction. \emph{Journal of Agricultural, Biological,
   and Environmental Statistics}, \textbf{4}, 29--56.
-
-\bibitem[{Royle(2004)}]{Royle2004a}
-Royle, J. (2004) N-mixture models for estimating population size from spatially
-  replicated counts. \emph{Biometrics}, \textbf{60}, 108--115.
-
-\bibitem[{Royle \emph{et~al.}(2004)Royle, Dawson \& Bates}]{Royle2004}
-Royle, J., Dawson, D. \& Bates, S. (2004) Modeling abundance effects in
-  distance sampling. \emph{Ecology}, \textbf{85}, 1591--1597.
-
-\bibitem[{Royle \& Dorazio(2008)}]{Royle2008}
-Royle, J. \& Dorazio, R. (2008) \emph{Hierarchical {M}odeling and {I}nference
-  in {E}cology}. Academic Press, London, U.K.
 
 \bibitem[{Rue \& Held(2005)}]{RueHeld2005}
 Rue, H. \& Held, L. (2005) \emph{Gaussian Markov Random Fields}. Chapman \&
@@ -171,5 +185,10 @@ Tierney, L., Kass, R.E. \& Kadane, J.B. (1989) Fully exponential {L}aplace
   approximations to expectations and vvariance of non positive functions.
   \emph{Journal of the American Statistical Association}, \textbf{84},
   710--716.
+
+\bibitem[{Warton \& Shepherd(2010)}]{WartonShepherd2010}
+Warton, D.I. \& Shepherd, L.C. (2010) Poisson point process models solve the
+  ``pseudo-absence" problem for presence-only data in ecology. \emph{Annals of
+  Applied Statistics}, \textbf{4}, 1383--1402.
 
 \end{thebibliography}
