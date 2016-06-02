@@ -1,7 +1,8 @@
 ### run simple preferential sampling example.  Doing in this in two steps since there seems to be
 # a conflict between TMB loop and rgeos ('gCentroid') functionality
 # need to declare an ADREPORT for Z_s in TMB for this
-setwd('c:/users/paul.conn/git/pref_sampling')
+if( FALSE ) setwd('c:/users/paul.conn/git/pref_sampling')
+if( Sys.info()['user']=="James.Thorson" ) setwd('C:/Users/James.Thorson/Desktop/Project_git/pref_sampling')
 source('./pref_sampling/R/util_funcs.R')
 library(sp)
 library(grid)
@@ -27,7 +28,8 @@ Version = "simple_v7"
 # v7 -- Includes option to allows b to vary as a trend surface
 
 # Compile
-TmbFile = "C:/Users/paul.conn/git/pref_sampling/TMB_version/inst/executables"
+if( FALSE ) TmbFile = "C:/Users/paul.conn/git/pref_sampling/TMB_version/inst/executables"
+if( Sys.info()['user']=="James.Thorson" ) TmbFile = "C:/Users/James.Thorson/Desktop/Project_git/pref_sampling/TMB_version/inst/executables"
 setwd( TmbFile )
 compile( paste0(Version,".cpp") )
 
@@ -83,10 +85,10 @@ Count[s_i]=c_i
 mesh = inla.mesh.create( loc_s )
 spde <- (inla.spde2.matern(mesh, alpha=1)$param.inla)[c("M0","M1","M2")]
 
-
 Options_vec = c( 'Prior'=switch(Spatial_model,"ICAR"=1,"SPDE_GMRF"=0), 'Alpha'=Alpha, 'IncludeDelta'=1, 'IncludeEta'=1, 'OutputSE'=1)
 
-
+# icov: Include covariates for Bernoulli sampling model?  (1=No, 2=Yes)
+# ib: Include preferential sampling parameters? (1=No, 2=Yes)
 for(icov in 1:2){
   for(ib in 1:2){
     # Data
@@ -140,6 +142,7 @@ for(icov in 1:2){
     Upper = Inf
     Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, lower=Lower, upper=Upper, control=list(trace=1, maxit=1000))         #
     Opt[["diagnostics"]] = data.frame( "Param"=names(Obj$par), "Lower"=-Inf, "Est"=Opt$par, "Upper"=Inf, "gradient"=Obj$gr(Opt$par) )
+    Opt[["IC"]] = c("AIC"=2*Opt$objective+2*length(Opt$par))
     Report = Obj$report()
     
     # Potentially fix random fields with zero sample or population variance
@@ -171,9 +174,10 @@ for(icov in 1:2){
     # SD
     #Report = Obj$report()
     SD=sdreport(Obj,bias.correct=TRUE)
-    Out=list(SD=SD,Report=Report)
-    fname=paste0("c:/users/paul.conn/git/pref_sampling/Output/OutBearded_cov",icov,"_b",ib,".RData")
-    save(Out,file=fname)
+    Out=list(Opt=Opt,SD=SD,Report=Report)
+    fname=paste0(TmbFile,"/../../../Output/OutBearded_cov",icov,"_b",ib)
+    save(Out,file=paste0(fname,".RData"))
+    capture.output( Out[c("Opt","SD")],file=paste0(fname,".txt"))
   } 
 }
 
