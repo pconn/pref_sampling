@@ -126,15 +126,15 @@ Type objective_function<Type>::operator() ()
   //DATA_SPARSE_MATRIX(Q_ICAR);
  
   // Parameters 
-  PARAMETER_VECTOR(beta_j);  
-  PARAMETER_VECTOR(beta_k);  
-  PARAMETER_VECTOR(beta_b );
+  PARAMETER_VECTOR(beta_j);              // Covariates affecting density
+  PARAMETER_VECTOR(beta_k);              // Coefficients governing probability of sampling
+  PARAMETER_VECTOR(beta_b );             // Preferential sampling parameters, linking density submodel to sampling probability submodel
   PARAMETER_VECTOR(logtau_z);      
   PARAMETER_VECTOR(logkappa_z);
   
   // Random effects
-  PARAMETER_VECTOR( deltainput_s );
-  PARAMETER_VECTOR( etainput_s );
+  PARAMETER_VECTOR( deltainput_s );         // Spatial variation in  density Z_s, and sampling probability R_s conditional on preferential sampling parameters
+  PARAMETER_VECTOR( etainput_s );           // Spatial variation in sampling probability R_s in excess of preferential sampling predictions
 
   // derived sizes
   int n_i = c_i.size();
