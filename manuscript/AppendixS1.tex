@@ -72,7 +72,7 @@ where $A_i$ gives the proportion of survey unit $i$ that is sampled and $p_i$ is
 \hspace{0.5in} We express variation in $Z_i$ generically as
 \begin{eqnarray}
   \label{eq:process}
-  Z_i & \sim & f(g^{-1}(\mu_i)),
+  [Z_i|\mu_i] & = & f(g^{-1}(\mu_i)),
 \end{eqnarray}
 where $f()$ is a probability mass function (e.g., Poisson for count data, Bernoulli for occupancy), $g()$ is a link function (e.g. probit or logit for occupancy, log for count data), and $\mu_i$ is a link-scale intensity value.  In applications described in this paper, we specify this intensity as
 \begin{eqnarray}
@@ -84,7 +84,7 @@ where $\beta_0$ is an intercept, ${\bf x}_i$ is a vector of covariates used to e
 \hspace{0.5in} We model the site selection probabilities in the same manner.  First, we write $R_i$, as
 \begin{eqnarray}
  \label{eq:R}
-  R_i & \sim & \text{Bernoulli}(h^{-1}(\nu_i)),
+  [R_i|\nu_i] & = & \text{Bernoulli}(h^{-1}(\nu_i)),
 \end{eqnarray}
 where $h()$ denotes a link function appropriate for binary data (e.g. logit, probit).  We then write the intensity for this model as
 \begin{eqnarray}
@@ -96,7 +96,7 @@ Here, $\beta_0^*$ is an intercept, ${\bf x}_i^*$ is a vector of covariates (in p
 
 \hspace{0.5in} We have yet to specify a model for spatial autocorrelation.  For analyses in this paper, we model mean-zero spatial random effects (i.e., the $\delta_i$ and $\eta_i$) for each site $i$ as multivariate normal:
 \begin{eqnarray*}
-  \boldsymbol{\lambda} & \sim & MVN(\textbf{0},\boldsymbol{\Sigma}_{\delta}), \text{ and} \\
+  \boldsymbol{\delta} & \sim & MVN(\textbf{0},\boldsymbol{\Sigma}_{\delta}), \text{ and} \\
   \boldsymbol{\eta} & \sim & MVN(\textbf{0},\boldsymbol{\Sigma}_{\eta}),
 \end{eqnarray*}
 where $\boldsymbol{\Sigma}_{\lambda}$ and $\boldsymbol{\Sigma}_{\eta}$ are covariance matrices.  As is typical of spatial models in statistics, we allow the magnitude of spatial autocorrelation to decrease as a function of the distance between survey units.  In particular, we use the well known Mat\'{e}rn covariance function to model covariance as a function of distance.  In addition to the distances between survey units (which we calculate relative to survey unit centroids), the Mat\'{e}rn covariance function uses a range (or scale) parameter $\kappa$, a precision parameter $\tau$ (inverse marginal variance), and a smoothness parameter to model covariance.  For analyses in this paper, we set the smoothness parameter to 1.0 and treat $\kappa$ and $\tau$ as parameters to be estimated.  To improve computational efficiency, we use a Gaussian Markov random field (GMRF) representation of the underlying Gaussian field \citep{LindgrenEtAl2011}, as described by \citet{ThorsonEtAl2015} (Appendix B).

@@ -88,7 +88,7 @@ Options_vec = c( 'Prior'=switch(Spatial_model,"ICAR"=1,"SPDE_GMRF"=0), 'Alpha'=A
 
 
 for(icov in 1:2){
-  for(ib in 1:2){
+  for(ib in 1:3){
     # Data
     Data = list("Options_vec"=Options_vec, "c_i"=c_i, "P_i"=Prop_sampled,"A_s"=1-Grid.new@data[,"land_cover"],"s_i"=s_i-1, "y_s"=y_s, "spde"=spde)
     if(icov==1)Data$X_sj=Data$X_sk=matrix(1,nrow=n_cells)
@@ -171,7 +171,7 @@ for(icov in 1:2){
     # SD
     #Report = Obj$report()
     SD=sdreport(Obj,bias.correct=TRUE)
-    Out=list(SD=SD,Report=Report)
+    Out=list(SD=SD,Report=Report,log_lik=-Opt$objective)
     fname=paste0("c:/users/paul.conn/git/pref_sampling/Output/OutBearded_cov",icov,"_b",ib,".RData")
     save(Out,file=fname)
   } 

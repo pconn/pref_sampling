@@ -129,7 +129,8 @@ plot_N_map<-function(cur.t=1,N,Grid,highlight=NULL,cell.width=1,leg.title="Abund
   require(ggplot2)
   require(rgeos)
   require(RColorBrewer)
-  if(is.null(myPalette)==TRUE)myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))  
+  #if(is.null(myPalette)==TRUE)myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
+  if(is.null(myPalette)==TRUE)myPalette <- colorRampPalette(brewer.pal(9, "YlOrBr"))
   Tmp=Grid
   if(is.null(highlight)==FALSE){
     midpoints=data.frame(gCentroid(Tmp[highlight,],byid=TRUE))

@@ -1,4 +1,4 @@
-\begin{thebibliography}{33}
+\begin{thebibliography}{34}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
@@ -25,6 +25,11 @@ Borchers, D.L., Laake, J.L., Southwell, C. \& Paxton, C.G.M. (2006)
 Buckland, S.T., Anderson, D.R., Burnham, K.P., Laake, J.L., Borchers, D.L. \&
   Thomas, L. (2001) \emph{Introduction to Distance Sampling: Estimating the
   abundance of biological populations}. Oxford University Press, Oxford, U.K.
+
+\bibitem[{Burnham \& Anderson(2002)}]{BurnhamAnderson2002}
+Burnham, K.P. \& Anderson, D.R. (2002) \emph{Model selection and multimodel
+  inference: a practical information-theoretic approach, 2nd Edition}.
+  Springer-Verlag, New York.
 
 \bibitem[{Chakraborty \emph{et~al.}(2010)Chakraborty, Gelfand, Wilson, Latimer
   \& Silander~Jr}]{ChakrabortyEtAl2010}

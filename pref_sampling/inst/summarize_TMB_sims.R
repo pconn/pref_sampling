@@ -10,7 +10,7 @@ load('Pref_sims_result4.Rda')
 Dat=rbind(Dat,Result)
 
 #remove 24 results with NAs occurring in fixed effect REs
-Dat=Dat[-which(Dat[,"NA.fixed"]>0),]
+#Dat=Dat[-which(Dat[,"NA.fixed"]>0),]
 #remove missinig sim records (original Results rows > # sims conducted)
 Dat=Dat[-which(Dat[,1]==0),]
 Dat=data.frame(Dat)
