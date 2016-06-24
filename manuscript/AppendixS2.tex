@@ -28,6 +28,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{center} \bf {\large Confronting preferential sampling in wildlife surveys: diagnosis and model-based triage}
 
+\rm
 \vspace{0.7cm}
 Paul B. Conn$^{1,*}$, James T. Thorson$^2$, Devin S. Johnson$^1$
 \end{center}
@@ -59,7 +60,7 @@ $^*$paul.conn@noaa.gov
 In addition to the models reported in the paper, we attempted to fit two different models with a trend surface specification for the preferential sampling process.  The models differed by whether or not predictive covariates were also modeled (the ice covariates described in the main article text), but otherwise the preferential sampling process was modeled similarly.  Specifically, when the probability $R_i$ that a location $i$ is selected for sampling is modeled as
 \begin{eqnarray}
  \label{eq:R}
-  R_i & \sim & \text{Bernoulli}(\textrm{expit}(\nu_i))),
+  R_i & \sim & \text{Bernoulli}(\textrm{logit}^{-1}(\nu_i)),
 \end{eqnarray}
 where
 \begin{eqnarray}
@@ -71,16 +72,16 @@ we implemented a trend surface model by writing $\bf{B}$ as
 \begin{eqnarray}
   \label{eq:B}
   \textbf{B} & = & {\bf C}{\bf b}.
-\end{eqnarray} 
+\end{eqnarray}
 Here, ${\bf b}$ is a column vector consisting of three estimated parameters, $b_0$, $b_1$, and $b_2$, and ${\bf C}$ is an $(S \times 3)$ design matrix constructed as follows:
 \begin{eqnarray}
-  \textbf{C} & = & \left[ 
+  \textbf{C} & = & \left[
     \begin{array}{ccc}
     1 & northing_1 & easting_1 \\
     1 & northing_2 & easting_2 \\
     \vdots & \vdots & \vdots \\
-    1 & northing_S & easting_S 
-    \end{array} 
+    1 & northing_S & easting_S
+    \end{array}
   \right].
 \end{eqnarray}
 The northing and easting values are simply the $y$ and $x$ coordinates associated with each grid cell centroid on the particular geographical projection of the earth's surface that we were using (in our case, EASE Grid 2.0).
@@ -99,7 +100,7 @@ The northing and easting values are simply the $y$ and $x$ coordinates associate
 \begin{figure*} %[ht]
 \begin{center}
 \includegraphics[width=170mm]{bearded_RE_maps.pdf}
-\caption{Estimates of spatial random effects for two models fitted to bearded seal count data.  Estimates from preferential sampling model $M_{cov=1,b=1}$ are provided in the first column of plots, while estimates from a second model with a trend surface specification for the preferential sampling parameter appear in the second column (this model also included covariate effects).  In the first column, the $\boldsymbol{\eta}$ random effects specific to the sampling probability model appear well estimated and to indicate a higher probability of sampling where transects were flown (as intended).  However, under the trend surface specification, these random effects are estimated to be close to zero, and the increased probability of sampling is passed on to the shared $\boldsymbol{\delta}$ random effects.} 
+\caption{Estimates of spatial random effects for two models fitted to bearded seal count data.  Estimates from preferential sampling model $M_{cov=1,b=1}$ are provided in the first column of plots, while estimates from a second model with a trend surface specification for the preferential sampling parameter appear in the second column (this model also included covariate effects).  In the first column, the $\boldsymbol{\eta}$ random effects specific to the sampling probability model appear well estimated and to indicate a higher probability of sampling where transects were flown (as intended).  However, under the trend surface specification, these random effects are estimated to be close to zero, and the increased probability of sampling is passed on to the shared $\boldsymbol{\delta}$ random effects.}
 \label{fig:bearded_RE_maps}
 \end{center}
 \end{figure*}

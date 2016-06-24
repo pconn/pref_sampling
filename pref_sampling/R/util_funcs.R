@@ -1,27 +1,4 @@
-#' Produce an RW2 structure matrix for a line (e.g. for time series)
-#' @param x length of vector
-#' @return RW2 precision matrix
-#' @export 
-#' @keywords adjacency
-#' @author Paul Conn
-linear_adj_RW2 <- function(x){
-  Q=Matrix(0,x,x)
-  for(i in 1:(x-2)){
-    Q[i,i+2]=1
-    Q[i+2,i]=1
-  }
-  for(i in 1:(x-1)){
-    Q[i,i+1]=-4
-    Q[i+1,i]=-4
-  }
-  Q[1,2]=-2
-  Q[2,1]=-2
-  Q[x,x-1]=-2
-  Q[x-1,x]=-2
-  diag(Q)=-rowSums(Q)
-  Q
-}  
-
+ 
 #' Produce an RW1 adjacency matrix for a rectangular grid for use with areal spatial models (queens move)
 #' @param x number of cells on horizontal side of grid
 #' @param y number of cells on vertical side of grid
@@ -97,19 +74,6 @@ rect_adj <- function(x,y,byrow=FALSE){
   return(Adj)
 }
 
-#' Produce weights for bivariate normal kernel for upper left triangular quadrant
-#' To save computing time, some building blocks are passed into
-#' the function
-#' @param Tmp.vec A length n vector for holding integrals of bivariate normal
-#' @param XY 2xn matrix giving x and y distances
-#' @param Sigma vector of length 2 giving sd of bivariate normal in the x and y directions 
-#' @return a filled vector that holds unnormalized redistribution kernel values
-#' @export 
-#' @keywords bivariate normal, kernel weight
-#' @author Paul Conn \email{paul.conn@@noaa.gov}
-d_biv_normal<-function(Tmp.vec,XY,Sigma){
-  return(dnorm(XY[1,],0,Sigma[1])*dnorm(XY[2,],0,Sigma[2]))
-}
   
 #' Function to plot abundance map for Bering Sea survey grid
 #' @param cur.t  Time step to plot map for
@@ -126,9 +90,9 @@ d_biv_normal<-function(Tmp.vec,XY,Sigma){
 #' @keywords abundance map, plot
 #' @author Paul Conn \email{paul.conn@@noaa.gov}
 plot_N_map<-function(cur.t=1,N,Grid,highlight=NULL,cell.width=1,leg.title="Abundance",hcolor='yellow',cur.max=NULL,myPalette=NULL){
-  require(ggplot2)
-  require(rgeos)
-  require(RColorBrewer)
+  #require(ggplot2)
+  #require(rgeos)
+  #require(RColorBrewer)
   #if(is.null(myPalette)==TRUE)myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
   if(is.null(myPalette)==TRUE)myPalette <- colorRampPalette(brewer.pal(9, "YlOrBr"))
   Tmp=Grid
@@ -184,25 +148,4 @@ expit<-function(x)1/(1+exp(-x))
 #' @author Paul Conn \email{paul.conn@@noaa.gov}
 logit<-function(x)log(x/(1-x))
 
-#' estimate optimal 'a' parameter for linex loss function
-#' @param Pred.G  Predicted group abundance
-#' @param Obs.G  Observed group abundance
-#' @param min.a Minimum value for linex 'a' parameter
-#' @param max.a Maximum value for linex 'a' parameter
-#' @return The optimal tuning parameter for linex loss function as determined by minimum sum of squares 
-#' @export
-#' @keywords linex
-#' @author Paul B. Conn
-calc_linex_a<-function(Pred.G,Obs.G,min.a=0.00001,max.a=1.0){
-  #Y=apply(Obs.G,2,mean)
-  Y=Obs.G
-  linex_ssq<-function(a,X,Y){
-    Theta=exp(-a*X)
-    Theta=-1/a*log(apply(Theta,1,'mean'))
-    Theta=-1/a*log(Theta)
-    return(sum((Y-Theta)^2))
-  }
-  a=optimize(f=linex_ssq,interval=c(min.a,max.a),X=Pred.G,Y=Y)
-  a
-}
- 
+

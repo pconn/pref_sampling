@@ -1,15 +1,9 @@
 ### plot preferential sampling plots using data from "run_sim_example.R"
-library(sp)
-library(maptools)
-library(rgeos)
-library(ggplot2)
-library(RColorBrewer)
-library(gridExtra)
-library(grid)
+library(PrefSampling)
 
-setwd('c:/users/paul.conn/git/pref_sampling')
-source('../SpatPred/SpatPred/R/util_funcs.R')
-load('./Sim_data/sim_plot_data.Rdata')
+#requires that the dataset sim_plot_data.RData be in the current working directory
+# this file can be created with "run_sim_example.R"
+load('./sim_plot_data.Rdata')
 
 N.true=matrix(Sim$N.true,ncol=1)
 N.1=matrix(Sim$N.1,ncol=1)
@@ -37,23 +31,19 @@ proj4string(Grid.SpP)=CRS(laea_180_proj)
 Grid=SpatialPolygonsDataFrame(Grid.SpP,data=data.frame(Cov=Cov),match.ID=FALSE)
 
 
-
-Grid.list=vector("list",1)
-Grid.list[[1]]=Grid
 max.N=100
-Ntrue.plot=plot_N_map(1,N.true,Grid=Grid.list)+ggtitle(expression(paste("C. True abundance (",N[i],")")))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
-N.plot.1=plot_N_map(1,N.1,Grid=Grid.list)+ggtitle(expression(paste("G. ",hat(N[i]),', b=0')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
-N.plot.2=plot_N_map(1,N.2,Grid=Grid.list)+ggtitle(expression(paste("H. ",hat(N[i]),', b=1')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
-N.plot.3=plot_N_map(1,N.3,Grid=Grid.list)+ggtitle(expression(paste("I. ",hat(N[i]),', b=5')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
+Ntrue.plot=plot_N_map(1,N.true,Grid=Grid)+ggtitle(expression(paste("C. True abundance (",N[i],")")))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
+N.plot.1=plot_N_map(1,N.1,Grid=Grid)+ggtitle(expression(paste("G. ",hat(N[i]),', b=0')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
+N.plot.2=plot_N_map(1,N.2,Grid=Grid)+ggtitle(expression(paste("H. ",hat(N[i]),', b=1')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
+N.plot.3=plot_N_map(1,N.3,Grid=Grid)+ggtitle(expression(paste("I. ",hat(N[i]),', b=5')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
 max.N=50
-C.plot.1=plot_N_map(1,C.1,Grid=Grid.list)+ggtitle(expression(paste('D. Counts (',Y[i],'), b=0')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
-C.plot.2=plot_N_map(1,C.2,Grid=Grid.list)+ggtitle(expression(paste('E. Counts (',Y[i],'), b=1')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
-C.plot.3=plot_N_map(1,C.3,Grid=Grid.list)+ggtitle(expression(paste('F. Counts (',Y[i],'), b=5')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
+C.plot.1=plot_N_map(1,C.1,Grid=Grid)+ggtitle(expression(paste('D. Counts (',Y[i],'), b=0')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
+C.plot.2=plot_N_map(1,C.2,Grid=Grid)+ggtitle(expression(paste('E. Counts (',Y[i],'), b=1')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
+C.plot.3=plot_N_map(1,C.3,Grid=Grid)+ggtitle(expression(paste('F. Counts (',Y[i],'), b=5')))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=YlOrBr(100),limits=c(0,max.N))   
 min.N=-2.5
 max.N=2.5
-Cov.plot=plot_N_map(1,Cov,Grid=Grid.list)+ggtitle("A. Covariate")+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=greenPalette(100),limits=c(min.N,max.N))   
-Delta.plot=plot_N_map(1,Delta,Grid=Grid.list)+ggtitle(expression(paste("B. Spatial random effects (",delta[i],")")))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=bluePalette(100),limits=c(min.N,max.N))   
-
+Cov.plot=plot_N_map(1,Cov,Grid=Grid)+ggtitle("A. Covariate")+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=greenPalette(100),limits=c(min.N,max.N))   
+Delta.plot=plot_N_map(1,Delta,Grid=Grid)+ggtitle(expression(paste("B. Spatial random effects (",delta[i],")")))+theme(plot.title = element_text(hjust = 0),legend.title = element_blank(),text=element_text(size=txt.size),plot.margin=unit(c(0,0,0,0),"lines"))+scale_fill_gradientn(colours=bluePalette(100),limits=c(min.N,max.N))   
 
 
 pdf(file="Pref_samp_sim_maps.pdf")

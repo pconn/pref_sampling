@@ -1,30 +1,7 @@
 ### run simple preferential sampling example.  Doing in this in two steps since there seems to be
 # a conflict between TMB loop and rgeos ('gCentroid') functionality
 # need to declare an ADREPORT for Z_s in TMB for this
-setwd('c:/users/paul.conn/git/pref_sampling')
-source('../SpatPred/SpatPred/R/util_funcs.R')
-library(sp)
-library(maptools)
-library( RandomFields )
-library( TMB )
-library( INLA )
-#library( ThorsonUtilities )
-
-Version = "simple_v6"
-# v2 -- added option for changing distribution for random effects, and implemented ICAR distribution
-# v3 -- added Bernoulli model for sampling locations, and removed the ICAR functionality (by commenting it out, to save speed during building the object)
-# v4 -- added simpler less-smooth SPDE option (may be faster!), and option to turn off delta or eta
-# v5 -- Implements Devin's finite population correction approach to posterior prediction; proportion area sampled additional input vector  
-# v6 -- Includes option to output Z_s in ADREPORT so unbiased map estimates can be made using bias.correct
-
-# Compile
-TmbFile = "C:/Users/paul.conn/git/pref_sampling/TMB_version/inst/executables"
-setwd( TmbFile )
-compile( paste0(Version,".cpp") )
-
-# SOurce
-source( paste0(TmbFile,"/../../examples/rect_adj.R") )
-source( paste0(TmbFile,"/../../examples/rrw.R") )
+library(PrefSampling)
 
 # Settings
 grid_dim = c("x"=25, "y"=25)
@@ -117,24 +94,19 @@ for(SimI in 1:length(b_set)){
     
     # Data
     spde <- (inla.spde2.matern(mesh, alpha=2)$param.inla)[c("M0","M1","M2")]
-    if(Version%in%c("simple_v1")) Data = list( "c_i"=c_i, "s_i"=s_i-1, "X_sj"=Zy, "spde"=spde)
-    if(Version%in%c("simple_v2")) Data = list( "Options_vec"=Options_vec, "c_i"=c_i, "s_i"=s_i-1, "X_sj"=cbind(1,x_s), "spde"=spde, "Q_ICAR"=Matrix(Q))
-    if(Version%in%c("simple_v4","simple_v3")) Data = list( "Options_vec"=Options_vec, "c_i"=c_i, "s_i"=s_i-1, "X_sj"=cbind(1,x_s), "y_s"=y_s, "X_sk"=cbind(x_s), "spde"=spde)
-    if(Version%in%c("simple_v5","simple_v6")) Data = list( "Options_vec"=Options_vec, "c_i"=c_i, "P_i"=Prop_sampled,"A_s"=rep(1,n_cells),"s_i"=s_i-1, "X_sj"=cbind(1,x_s), "y_s"=y_s, "X_sk"=cbind(x_s), "spde"=spde)
+    Data = list( "Options_vec"=Options_vec, "c_i"=c_i, "P_i"=Prop_sampled,"A_s"=rep(1,n_cells),"s_i"=s_i-1, "X_sj"=cbind(1,x_s), "y_s"=y_s, "X_sk"=cbind(x_s), "spde"=spde, "X_sb"=matrix(1,nrow=n_cells))
     
     # Parameters
     # Intercept is needed for beta_j (delta -- abundance) but not beta_k (eta -- sampling intensity)
     if( Options_vec['Prior']==0 ) etainput_s = deltainput_s = rep(0,mesh$n)
     if( Options_vec['Prior']==1 ) etainput_s = deltainput_s = rep(0,prod(grid_dim))
-    if(Version %in% c("simple_v2","simple_v1")) Params = list("beta_j"=rep(0,ncol(Data$X_sj)), "logtau"=log(1), "logkappa"=log(1), "nuinput_s"=nuinput_s )
-    if(Version %in% c("simple_v6","simple_v5","simple_v4","simple_v3")) Params = list("beta_j"=rep(0,ncol(Data$X_sj)), "beta_k"=rep(0,ncol(Data$X_sk)), "b"=0, "logtau_z"=rep(0,2), "logkappa_z"=rep(0,2), "deltainput_s"=deltainput_s, "etainput_s"=etainput_s)
+    Params = list("beta_j"=rep(0,ncol(Data$X_sj)), "beta_k"=rep(0,ncol(Data$X_sk)), "beta_b"=0, "logtau_z"=rep(0,2), "logkappa_z"=rep(0,2), "deltainput_s"=deltainput_s, "etainput_s"=etainput_s)
     Params$beta_j[1]=median(log(Ztrue_s+0.01)) #set mean expected abundance close to truth for faster optimization
     
     # Random
-    if(Version %in% c("simple_v2","simple_v1")) Random = c( "nuinput_s" )
-    if(Version %in% c("simple_v6","simple_v5","simple_v4","simple_v3")) Random = c( "deltainput_s", "etainput_s" )
+    Random = c( "deltainput_s", "etainput_s" )
     if(Use_REML==TRUE) Random = c(Random,"beta_j","beta_k")
-    if(Use_REML==TRUE & Version%in%c("simple_v6","simple_v5","simple_v4","simple_v3")) Random = c( Random, "b" )
+    if(Use_REML==TRUE) Random = c( Random, "b" )
     
     # Fix parameters
     Map = list()
@@ -149,14 +121,14 @@ for(SimI in 1:length(b_set)){
     }
     # Eliminate linkeage of density and sampling intensity
     if( EM=="fix_b" ){
-      Map[["b"]] = factor(NA)
+      Map[["beta_b"]] = factor(NA)
     }
     
     # Make object
     #compile( paste0(Version,".cpp") )
-    dyn.load( dynlib(Version) )
+    #dyn.load( dynlib(Version) )
     Start_time = Sys.time()
-    Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE)
+    Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE, DLL="PrefSampling")
     Obj$fn( Obj$par )
     
     # Run
@@ -194,7 +166,7 @@ for(SimI in 1:length(b_set)){
     # SD
     #Report = Obj$report()
     SD=sdreport(Obj,bias.correct=TRUE)
-    Est[[SimI]]=SD$unbiased$value[4:628]
+    Est[[SimI]]=SD$unbiased$value[5:629]
     #if( all(c("etainput_s","deltainput_s")%in%names(Map)) ){
     #  Est[[EstI]]=Report$Z_s
     #}else{
@@ -205,5 +177,5 @@ for(SimI in 1:length(b_set)){
 }
 
 Sim=list("N.1"=Est[[1]],"N.2"=Est[[2]],"N.3"=Est[[3]],"C.1"=Counts[[1]],"C.2"=Counts[[2]],"C.3"=Counts[[3]],"N.true"=Ztrue_s,"Delta"=delta_s,"Cov"=x_s)
-save(Sim,file="c:/users/paul.conn/git/pref_sampling/Sim_Data/sim_plot_data.Rdata")
+save(Sim,file="sim_plot_data.Rdata")
 

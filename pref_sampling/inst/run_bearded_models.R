@@ -1,41 +1,13 @@
 ### run simple preferential sampling example.  Doing in this in two steps since there seems to be
 # a conflict between TMB loop and rgeos ('gCentroid') functionality
 # need to declare an ADREPORT for Z_s in TMB for this
-if( FALSE ) setwd('c:/users/paul.conn/git/pref_sampling')
-if( Sys.info()['user']=="James.Thorson" ) setwd('C:/Users/James.Thorson/Desktop/Project_git/pref_sampling')
-source('./pref_sampling/R/util_funcs.R')
-library(sp)
-library(grid)
-library(maptools)
-library( RandomFields )
-library( TMB )
-library( INLA )
-library(rgeos)
-library(gridExtra)
-#load("Effort2012_bearded_PrefSamp_21Dec2015.Rdata")  
-load('Data_for_ST_plot.Rdata') #includes spatial objects associated w landscape
-load("Bearded_effort.Rda")  #formatted with BOSSst "format_Bering2012_all.R"
-load("AlaskaBeringData2012_2013_14Dec2015.Rdat")  #from bass package on github/nmml
+library(PrefSampling)
+
+data(AlaskaBeringData)
+data(Bearded_effort)
+data(Data_for_ST_plot)
+
 Effort=Bearded_effort
-#library( ThorsonUtilities )
-
-Version = "simple_v7"
-# v2 -- added option for changing distribution for random effects, and implemented ICAR distribution
-# v3 -- added Bernoulli model for sampling locations, and removed the ICAR functionality (by commenting it out, to save speed during building the object)
-# v4 -- added simpler less-smooth SPDE option (may be faster!), and option to turn off delta or eta
-# v5 -- Implements Devin's finite population correction approach to posterior prediction; proportion area sampled additional input vector  
-# v6 -- Includes option to output Z_s in ADREPORT so unbiased map estimates can be made using bias.correct
-# v7 -- Includes option to allows b to vary as a trend surface
-
-# Compile
-if( FALSE ) TmbFile = "C:/Users/paul.conn/git/pref_sampling/TMB_version/inst/executables"
-if( Sys.info()['user']=="James.Thorson" ) TmbFile = "C:/Users/James.Thorson/Desktop/Project_git/pref_sampling/TMB_version/inst/executables"
-setwd( TmbFile )
-compile( paste0(Version,".cpp") )
-
-# SOurce
-#source( paste0(TmbFile,"/../../examples/rect_adj.R") )
-#source( paste0(TmbFile,"/../../examples/rrw.R") )
 
 #create single Grid SpatialPolygonsDataFrame, averaging over covariate values
 Grid.new=Data$Grid$y2012[[1]]
@@ -132,9 +104,9 @@ for(icov in 1:2){
     
     # Make object
     #compile( paste0(Version,".cpp") )
-    dyn.load( dynlib(Version) )
+    #dyn.load( dynlib(Version) )  #don't need when DLL specified below and cpp file is in src directory
     Start_time = Sys.time()
-    Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE)
+    Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE, DLL="PrefSampling")
     Obj$fn( Obj$par )
     
     # Run
@@ -176,14 +148,14 @@ for(icov in 1:2){
     SD=sdreport(Obj,bias.correct=TRUE)
 
     Out=list(Opt=Opt,SD=SD,Report=Report)
-    fname=paste0(TmbFile,"/../../../Output/OutBearded_cov",icov,"_b",ib)
+    fname=paste0(TmbFile,"./OutBearded_cov",icov,"_b",ib)
     save(Out,file=paste0(fname,".RData"))
     capture.output( Out[c("Opt","SD")],file=paste0(fname,".txt"))
   } 
 }
 
 #plot map of estimates
-str1='c:/users/paul.conn/git/pref_sampling/Output/OutBearded_cov'
+str1='./OutBearded_cov'
 load(paste0(str1,2,"_b",1,".Rdata"))
 Out$SD$value[1:10]
 library(RColorBrewer)
@@ -217,6 +189,11 @@ Counts=Counts + geom_polygon(data=Russia_points,fill="tan",aes(long,lat,group=gr
 Counts=Counts+coord_cartesian(xlim=c(-100000,1500000),ylim=c(-3700000,-2500000))
 Counts=Counts+ggtitle("A. Seal counts")+theme(plot.title = element_text(hjust = 0,size = rel(1)))
 Counts
+
+#Counts=Counts+ggtitle("")
+pdf(file="bearded_counts.pdf")
+Counts
+dev.off()
 
 #ggplot(AK_points)+geom_polygon(aes(long,lat,group=group))
 #Grid.new@data$Count=Sampled
