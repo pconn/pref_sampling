@@ -10,9 +10,9 @@
 
 \bibitem[{Banerjee \emph{et~al.}(2008)Banerjee, Gelfand, Finley \&
   Sang}]{BanerjeeEtAl2008}
-Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Stationary process
-  approximation for the analysis of large spatial datasets. \emph{Journal of
-  the Royal Statistical Society B}, \textbf{70}, 825--848.
+Banerjee, S., Gelfand, A.E., Finley, A.O. \& Sang, H. (2008) Gaussian
+  predictive process models for large spatial datasets. \emph{Journal of the
+  Royal Statistical Society B}, \textbf{70}, 825--848.
 
 \bibitem[{Borchers \emph{et~al.}(2006)Borchers, Laake, Southwell \&
   Paxton}]{Borchers2006}
@@ -103,10 +103,11 @@ Johnson, D.S., Laake, J.L. \& Ver~Hoef, J.M. (2010) A model-based approach for
   making ecological inference from distance sampling data. \emph{Biometrics},
   \textbf{66}, 310--318.
 
-\bibitem[{Kristensen \emph{et~al.}(2015)Kristensen, Nielsen \&
-  Berg}]{KristensenEtAl2015}
-Kristensen, K., Nielsen, A. \& Berg, C.W. (2015) Template {M}odel {B}uilder
-  tmb. \emph{Journal of Statistical Software}, In Press.
+\bibitem[{Kristensen \emph{et~al.}(2016)Kristensen, Nielsen, Berg, Skaug \&
+  Bell}]{KristensenEtAl2016}
+Kristensen, K., Nielsen, A., Berg, C.W., Skaug, H. \& Bell, B.M. (2016) {TMB}:
+  Automatic differentiation and {L}aplace approximation. \emph{Journal of
+  Statistical Software}, \textbf{70}, 1--21.
 
 \bibitem[{Latimer \emph{et~al.}(2009)Latimer, Banerjee, Sang, Moshner \&
   Silander~Jr.}]{LatimerEtAl2009}

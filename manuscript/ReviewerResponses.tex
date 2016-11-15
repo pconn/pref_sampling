@@ -1,0 +1,193 @@
+
+\documentclass[12pt,fleqn]{article}
+%\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,epsfig,epsf,psfrag,color,ecology,natbib}
+%\usepackage{a4wide,amsmath,epsfig,epsf,psfrag}
+\usepackage[nolists]{endfloat}
+\bibliographystyle{ecology}
+
+%  put your commands here
+
+\def\be{{\ensuremath\mathbf{e}}}
+\def\bx{{\ensuremath\mathbf{x}}}
+\def\bftheta{{\ensuremath\boldsymbol{\theta}}}
+\def\bfeta{{\ensuremath\boldsymbol{\eta}}}
+\def\bfdelta{{\ensuremath\boldsymbol{\delta}}}
+\def\bfSigma{{\ensuremath\boldsymbol{\Sigma}}}
+\def\bfB{\textbf{B}}
+\newcommand{\VS}{V\&S}
+\newcommand{\tr}{\mbox{tr}}
+
+\begin{document}
+
+\bf \hspace{-.32in} Conn et al. responses to reviewer comments
+
+%  make sure that the document has 25 lines per page (it is 12 pt)
+
+\setlength{\textheight}{575pt} \setlength{\baselineskip}{23pt}
+
+%  IMPORTANT -- place the \title, \author, etc, \begin{summary}...
+%  \end{summary} \keywords statements in the order demonstrated below
+\rm
+Here, we provide line by line responses to associate editor and reviewer comments, suggestions, and edits.  For completeness, we include all reviewer comments in addition to our responses (our responses are in blue).  We have also included responses to additional comments we received from a quantitative ecologist (Mark K\'{e}ry) that we hope will improve presentation to non-statisticians.  In addition to these responses, we provide a marked up PDF version of our manuscript showing all changes made.
+
+\section{Associate editor}
+
+[From decision letter]
+In view of the comments received, I must decline your manuscript for publication in the Methods in Ecology and Evolution at this time.  However, we would be willing to consider a new manuscript which takes into consideration these comments. In addition to the other comments, I would ask you to try to make the presentation more accessible to an ecological audience - as you put it in the context of SDMs, I think it should really be understandable by ecologists working with SDMs. I appreciate that this can be difficult.
+
+\textcolor{blue}{
+We thank the associate editor for the invitation to resubmit, and for their constructive criticism.  In our revision, we have made an effort to make the manuscript more accessible to quantitative ecologists and to those working in the SDM modeling field.  It is unfortunate that there seems to be a different set of traditions (and jargon) between those working in the scientific survey world (e.g., planned surveys of occupancy and abundance), and those working with presence-only data.  Admittedly, there are different challenges in each, but it can make cross-communication somewhat difficult.  In the attached we've tried to emphasize relationships between the two fields and to locate or work within the broader sphere of SDM modeling.}
+
+To give one example, you wrote (p4, l78-80):
+``For instance, PS can occur when the investigator uses a priori knowledge or observations of the state variable obtained during sampling to allocate survey effort in places where abundance or occurrence is known to be high."
+
+which could be re-written as
+
+``For instance, PS can occur when the investigator tends to sample more in places where a species has already been observed, or is known to be abundant."
+
+\textcolor{blue} {This formulation is much more to the point; we have accepted this change.}
+
+[From the comments to author section]
+Your paper definitely focuses on an important issue, and provides ways to address the problem. Besides the issues raised by the referee, I think you should relate your paper a bit more to the ecological literature, in particular on SDMs (see Edwards et al. 2006). I think in particular that in addition to the types of sampling you discuss, one could also consider sampling designs that are optimal to estimate response curve (eg Albert et al. 2010 - sorry for the self-citation...). Ecological studies may have different objectives, and I think you should try to make your paper relevant to as many readers as possible.
+
+Albert, C. H., N. G. Yoccoz, T. C. Edwards, C. H. Graham, N. E. Zimmermann, and W. Thuiller. 2010. Sampling in ecology and evolution – bridging the gap between theory and practice. Ecography 33:1028-1037.
+Edwards, T. C., D. R. Cutler, N. E. Zimmermann, L. Geiser, and G. G. Moisen. 2006. Effects of sample survey design on the accuracy of classification tree models in species distribution models. Ecological Modelling 199:132-141.
+
+\textcolor{blue}{We thank the editor for pointing us to these articles - our knowledge of the species distribution modeling literature is admittedly a little lacking.  These papers are certainly germane to the present study, and we have included additional material in the introduction (2nd paragraph) that talks about (1) implications of design vs. model-based inference, and (2) the importance of the particular objective function (e.g., minimizing variance, estimating species-habitat relationships) for optimal design.}
+
+\section{Reviewer 1}
+
+{\bf A generalized preferential sampling model}
+
+Your random effects model doesn’t appear similar to \citet{RoyleBerliner1999} to me at all, and in fact this suggestion led to some confusion on my part about how these random effects were specified. The joint
+specification of $\bfeta$ and $\bfdelta$, following \citet{RoyleBerliner1999} and assuming 0 mean, is:
+\begin{equation}
+  \left(
+    \begin{array}{c}
+    \bfeta \\
+    \bfdelta
+    \end{array}
+   \right)
+   \sim \textrm{Gaussian}
+   \left(
+     \left(
+       \begin{array}{c}
+       0 \\
+       0
+       \end{array}
+     \right),
+     \left(
+       \begin{array}{cc}
+         \bfSigma_\eta + \bfB \bfSigma_\delta \bfB^\prime & \bfB \bfSigma_\delta \\
+         (\bfB \bfSigma_\delta)^\prime & \bfSigma_\delta
+       \end{array}
+     \right)
+   \right),
+\end{equation}
+which has a very different covariance structure than the random effects model presented in Appendix S1.
+
+\textcolor{blue}{There are several points to make here.  First, we never claimed that we were fitting the exact model proposed by \citet{RoyleBerliner1999} - we're not.  However, the covariance structure implied by the two model \emph{is} actually very similar.  For instance, if $\bfeta \sim \text{Gaussian}({\bf 0},\bfSigma_\eta)$ and $\bfdelta \sim \text{Gaussian}({\bf 0},\bfSigma_\delta)$, then
+\begin{equation}
+  \text{Cov}\left(
+    \begin{array}{c}
+    \bfeta + \bfB \bfdelta \\
+    \bfdelta
+    \end{array}
+   \right)
+   =
+   \left(
+   \begin{array}{cc}
+      \bfSigma_\eta + \bfB \bfSigma_\delta \bfB^\prime & \bfB \bfSigma_\delta \\
+         (\bfB \bfSigma_\delta)^\prime & \bfSigma_\delta
+    \end{array}
+   \right),
+\end{equation}
+as desired.  Second, it seems less important that the model be exactly the same as it does to provide a motivation (and citation) for how the $\bfB$ matrix can be specified.  We think both of these points were adequately accounted for in our initial submission, as we (a) described the \citet{RoyleBerliner1999} model as being ``similar" to the one we proposed here, and (b) used their paper as a reference for how the $\bfB$ matrix can be formulated and interpreted.
+}
+
+In your application, line 199, you report difficulties fitting a model with even modest structure on $\bfB$. Might a
+joint model for $\bfeta$ and $\bfdelta$, as specified by \citet{RoyleBerliner1999}, allow you to specify a more complicated
+model for $\bfB$?
+
+\textcolor{blue}{
+  As suggested above, we believe our model to be very similar to that proposed by \citet{RoyleBerliner1999}.  We're not seeing how drawing the random effects jointly would necessarily improve performance (we're also having trouble seeing how we could implement this in our chosen software).  Also, after further investigation of the \citet{RoyleBerliner1999} paper, we're not sure they ever actually fit a model with a more complicated relationship in $\bfB$.  In fact, their one example on ozone-temperature analysis uses the same simple diagonal parameterization we used here.  So we think the question remains whether more complicated models for $\bfB$ are ever identifiable, and if so, whether they are reasonable to fit with data sets typical of ecological applications.  We've adjusted text in several places to reflect this. For instance, we state that ``However, to our knowledge the identifiability of higher order models (such as trend surfaces) has not been investigated" when talking about higher order preferential sampling models.  In the discussion, we indicate that ``We attempted to fit models to bearded seal data where the degree of PS changed over the landscape, as \citet{RoyleBerliner1999} suggested might be possible (but never demonstrated) for multivariate spatial models."  We also suggest that identifiability of such models be further investigated in future research.
+}
+
+On line 139, you suggest “we often need to fix $\beta_0^* = 0.0$ . . . to permit parameter identification”. The word
+``often" suggests you can sometimes include the intercept parameter when estimating random effects. Can
+you provide more guidance about when you would need to fix the intercept at 0, and how a practitioner
+would know they need to fit the intercept at 0?
+
+\textcolor{blue}{
+  This wording was too ambiguous, and was likely a result of initially fitting different types of spatial models to the data.  For instance, ICAR type models have a known parameter redundancy built in, such that the intercept is confounded with the spatial process \citep{RueHeld2005}.  The type of Gaussian process model we settled on and used in analysis does not suffer from this deficiency.  Further confusion resulted from incorrectly specifying a multinomial logit link function in our initial analyses.  We have rectified this mistake in the present version, and all models for $R_i$ are now Bernoulli with a logit link, so that the intercept term is now identifiable.  We now report results for this corrected analysis.
+}
+
+{\bf Notation}
+
+I have difficulty following your notation at several points throughout the manuscript, which are outlined
+below.
+
+On line 41, you state $Z_i$ is the state variable of interest (e.g., occupancy or abundance), which I take will
+be the notation you use throughout given the section header. Your specication for a count model on eqn
+4 therefore becomes confusing. In particular, if $Z_i$ represents abundance, for reasonable values of $A_i$ and $p_i$ you could have random realizations $Y_i$ from a Poisson distribution that are greater than abundance, $Z_i$. If $Z_i$ does not represent abundance, what state process is represented here?
+
+\textcolor{blue}{
+  We have replaced the Poisson observation model with a binomial one in eqn 4 to make this clearer, and have indicated dependence on $Z_i$ through conditioning.  The reason that we had the Poisson in there originally is that the models we fit to data use the fact that the marginal distribution for $Y_i$ given the Poisson-Binomial mixture is itself a Poisson distribution.  However, we think it will be clearer to present the model hierarchically at this stage and then to describe our marginalization (something many ecologists may not care about) when describing software.  We have created a new ``Software" methods subsection which describes this in greater detail. Importantly, we describe how predictions are made; when detection probability is equal to 1.0, predictions are made using the formulation $\hat{N}_i = Y_i + (1-A_i)\exp(\hat{\mu}_i)$.  This framework incorporates a finite population correction and is similar to that employed by \citet{JohnsonEtAl2010} in the context of point process likelihood analysis of distance sampling data.  It also prevents predicted abundance in a cell from being less than the observed count.
+}
+
+
+
+\section{Additional reviewer: Marc K\'{e}ry}
+
+I read your ms and found it very stimulating and also well-written. Just a couple of minor comments which I noted during my reading.
+-          P.3, eq. 4: why do you put a Poisson observation model here ? In particular, since the Poisson has no “ceiling”, p cannot be detection probability but must be a detection rate, i.e., the combination of false-positive and false-negative errors. I note that in the Appendix 1 you have the usual Binomial observation model
+
+\textcolor{blue}{This was also noted by Reviewer 1. There are two alternatives here.  In the first, one can use some sort of simulation-based inference (e.g. MCMC) to model both components of the hierarchy (i.e. $[{\bf Z}|\bftheta]$ and $[{\bf Y}|{\bf Z}]$), in which case one could specify $[{\bf Z}|\bftheta]$ to be Poisson and $[{\bf Y}|{\bf Z},p]$ to be binomial.  Keeping track of the latent $Z_i$s, one then has an entirely coherent model for abundance.  However, from a computational standpoint, it is much easier to deal with the unconditional distribution $[{\bf Y}|\bftheta,p]$.  If $\bftheta$ are the expectations of ${\bf Z}$, then unconditionally $[{\bf Y}|\bftheta,p] = \text{Poisson}(\bftheta p)$ (apologies for a little sloppiness in notation here).   From a computational standpoint, the Poisson distribution is much easier to deal with, as one can bring the TMB machinery into the analysis (in particular, since it works with derivatives, it can't handle discrete random effects). The inference about the parameters $\bftheta$ should be completely coherent. The disadvantage is that one must then predict the latent ${\bf Z}$ parameters: e.g. once we have conducted inference relative to $\bftheta$, one must then predict $Z_i \sim \text{Poisson}(\theta_i)$. This isn't perfect, as we could potentially have the case that the predicted $Z_i$ is actually less that the count $Y_i$.  However, it should be a reasonable approximation, especially when focus is on absolute abundance (i.e. $\sum Y_i$) and will actually be a good approximation at the individual cell level whenever $Z_i$ is large and $p$ is small (e.g., when only a small fraction of each survey unit is sampled, as in the bearded seal example).  We note that a) this strategy of inference has been used in several recent applications with good results (e.g. \cite{ThorsonEtAl}, and b) the simulation results suggest this procedure is unbiased (see Fig. 4, Independent estimation model, $b=0$ case).  Note that in simulations, we did generate data as $[{\bf Z}] = \text{Poisson}$ and $[{\bf Y} | {\bf Z}] = \text{Binomial}$.  We now discuss this tradeoff more explicitly, both in Appendix S1 and in the Discussion.
+}
+
+Line 68: What are platforms of opportunity ? perhaps sea mammal jargon ? Hard to understand for non-sea-mammal guys like myself
+
+\textcolor{blue}{This is a good point - it is actually marine mammal jargon (for example, U.S. military ships providing locations where whale observations are made opportunistically).  We deleted this term, replacing it with ``opportunistic sampling."}
+
+
+-          Line 139: doesn’t setting beta-star-0 to zero imply that the probability of a sample unit to be surveyed is fixed at 1 for the average environmental conditions (if covariates are centred) ?
+-          168: lest
+-          199: I would say “and estimates are not reported here”
+-          209 and 211: fig. instead of Fig
+-          317: typo
+-          Fig. 1: main title left: Coarse scale
+-          Fig. 4, legend: since you’re doing ML you may briefly comment on why you have a posterior mode here ? Presumably some application of Bayes rule for empirical Bayes estimates ?
+
+
+\bibliography{master_bib}
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -221,9 +221,9 @@ Type objective_function<Type>::operator() ()
   vector<Type> linpredR_s = X_sk * beta_k;
   vector<Type> b_s = X_sb * beta_b;
   for(int s=0; s<n_s; s++){
-    R_s(s) = exp( linpredR_s(s) + b_s(s)*delta_s(s) + eta_s(s) );
+    R_s(s) = 1 / (1 + exp(-linpredR_s(s) - b_s(s)*delta_s(s) - eta_s(s) ));
   }
-  R_s = R_s / R_s.sum();
+
   
   // Probability of sampling locations
   for(int s=0; s<n_s; s++){

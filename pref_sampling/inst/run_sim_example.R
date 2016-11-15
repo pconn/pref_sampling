@@ -24,11 +24,6 @@ EM_set = c("fix_b","est_b")
 
 # Configurations
 
-# Source ICAR precision matrix function
-Q = rect_adj( x=grid_dim['x'], y=grid_dim['y'] )
-Q = -1*Q
-diag(Q) = -1 * colSums(Q)
-
 set.seed(12345)
 
 Counts=Est=vector("list",3)
@@ -157,8 +152,8 @@ for(SimI in 1:length(b_set)){
       }
       Data$Options_vec[Which+2] = 0
       # Re-run
-      if( length(Which)!=2 ) Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE)
-      if( length(Which)==2 ) Obj = MakeADFun( data=Data, parameters=Params, random=NULL, map=Map, silent=TRUE)
+      if( length(Which)!=2 ) Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE,DLL="PrefSampling")
+      if( length(Which)==2 ) Obj = MakeADFun( data=Data, parameters=Params, random=NULL, map=Map, silent=TRUE,DLL="PrefSampling")
       Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, lower=Lower, upper=Upper, control=list(trace=1, maxit=1000))         #
       Opt[["diagnostics"]] = data.frame( "Param"=names(Obj$par), "Lower"=-Inf, "Est"=Opt$par, "Upper"=Inf, "gradient"=Obj$gr(Opt$par) )
     }

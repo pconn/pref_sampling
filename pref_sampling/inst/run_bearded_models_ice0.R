@@ -67,7 +67,7 @@ for(icov in 1:2){
     if(icov==1)Data$X_sj=Data$X_sk=matrix(1,nrow=n_cells)
     if(icov>1){
       Data$X_sj=cbind(1,x_s_z)
-      Data$X_sk=cbind(x_s_z)
+      Data$X_sk=cbind(1,x_s_z)
     }   
     if(ib<3)Data$X_sb=matrix(1,nrow=n_cells)
     if(ib==3)Data$X_sb=cbind(x_s_b)
@@ -135,8 +135,8 @@ for(icov in 1:2){
       }
       Data$Options_vec[Which+2] = 0
       # Re-run
-      if( length(Which)!=2 ) Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE)
-      if( length(Which)==2 ) Obj = MakeADFun( data=Data, parameters=Params, random=NULL, map=Map, silent=TRUE)
+      if( length(Which)!=2 ) Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE,DLL="PrefSampling")
+      if( length(Which)==2 ) Obj = MakeADFun( data=Data, parameters=Params, random=NULL, map=Map, silent=TRUE,DLL="PrefSampling")
       Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, lower=Lower, upper=Upper, control=list(trace=1, maxit=1000))         #
       Opt[["diagnostics"]] = data.frame( "Param"=names(Obj$par), "Lower"=-Inf, "Est"=Opt$par, "Upper"=Inf, "gradient"=Obj$gr(Opt$par) )
     }
@@ -144,7 +144,7 @@ for(icov in 1:2){
     # SD
     #Report = Obj$report()
     SD=sdreport(Obj,bias.correct=TRUE)
-    Out=list(SD=SD,Report=Report)
+    Out=list(Opt=Opt,SD=SD,Report=Report)
     fname=paste0("./OutBearded_cov",icov,"_b",ib,"ice0.RData")
     save(Out,file=fname)
   } 
@@ -152,14 +152,14 @@ for(icov in 1:2){
 
 #plot map of estimates
 str1='./OutBearded_cov'
-load(paste0(str1,2,"_b",1,"ice0.Rdata"))
+load(paste0(str1,2,"_b",2,"ice0.Rdata"))
 Out$SD$value[1:10]
 library(RColorBrewer)
 library(ggplot2)
 myPalette=colorRampPalette(brewer.pal(9, "Purples")) 
 #n.fixed.eff=ncol(x_s_z)+2
 n.fixed.eff=4
-N.spat=matrix(Out$SD$value[(n.fixed.eff+3):(n_cells+n.fixed.eff+2)],ncol=1)
+N.spat=matrix(Out$SD$unbiased$value[(n.fixed.eff+3):(n_cells+n.fixed.eff+2)],ncol=1)
 Ests = plot_N_map(cur.t=1,N=N.spat,Grid=Grid.new,myPalette=myPalette)
 Ests=Ests+ggtitle("B. Modeled abundance")+theme(plot.title = element_text(hjust = 0,size = rel(1)))
 
