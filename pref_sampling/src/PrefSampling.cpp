@@ -254,6 +254,7 @@ Type objective_function<Type>::operator() ()
   ADREPORT( beta_j );
   ADREPORT( total_abundance);
   if(Options_vec(4)==1){
+    ADREPORT(beta_k);
     ADREPORT( beta_b ); 
     ADREPORT(Z_s);
   }

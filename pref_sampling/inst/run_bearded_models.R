@@ -1,12 +1,8 @@
-### run simple preferential sampling example.  Doing in this in two steps since there seems to be
-# a conflict between TMB loop and rgeos ('gCentroid') functionality
-# need to declare an ADREPORT for Z_s in TMB for this
+### run simple preferential sampling models on bearded seal data
 library(PrefSampling)
-
-data(AlaskaBeringData)
+data(Data_for_ST_plot) #includes spatial objects associated w landscape
 data(Bearded_effort)
-data(Data_for_ST_plot)
-
+data(AlaskaBeringData)  #from bass package on github/nmml
 Effort=Bearded_effort
 
 #create single Grid SpatialPolygonsDataFrame, averaging over covariate values
@@ -20,6 +16,7 @@ Grid.new@data=Grid.new@data/length(Days)
 Which.incl = which(Effort$Mapping[,2]<8)
 Mapping=Effort$Mapping[Which.incl,1]
 Prop_sampled=Effort$Area.trans[Which.incl]
+Prop_sampled[which(is.na(Prop_sampled))]=1.0
 Count.data=Effort$Count.data[Which.incl,]
 
 # Settings
@@ -41,11 +38,13 @@ set.seed(12345)
 # massage into paper notation
 s_i = Mapping
 y_s = ifelse(1:n_cells %in% s_i, 1, 0)
-x_s_z = cbind(Grid.new@data[,"ice_conc"],Grid.new@data[,"ice_conc"]^2,Grid.new@data[,"dist_edge"])  
-x_s_y = x_s_z
+x_s_z = cbind(Grid.new@data[,"ice_conc"],Grid.new@data[,"ice_conc"]^2,Grid.new@data[,"dist_edge"],Grid.new@data[,"depth"],Grid.new@data[,"depth"]^2,Grid.new@data[,"dist_land"])  
+x_s_y = cbind(Grid.new@data[,"dist_land"])  
 x_s_b = matrix(1,nrow=n_cells,ncol=3)  #design matrix for preferential sampling effect
 Centroids=gCentroid(Grid.new,byid=TRUE)
 loc_s=cbind(Centroids$x,Centroids$y)/25067.53 #standardize by making distance between neighboring cells = 1.0
+loc_s[,1]=loc_s[,1]/mean(loc_s[,2])
+loc_s[,2]=loc_s[,2]/mean(loc_s[,2])
 colnames(loc_s)=c("x","y")
 rownames(loc_s)=c(1:n_cells)
 x_s_b[,2:3] = loc_s
@@ -57,18 +56,18 @@ Count[s_i]=c_i
 mesh = inla.mesh.create( loc_s )
 spde <- (inla.spde2.matern(mesh, alpha=1)$param.inla)[c("M0","M1","M2")]
 
+
 Options_vec = c( 'Prior'=switch(Spatial_model,"ICAR"=1,"SPDE_GMRF"=0), 'Alpha'=Alpha, 'IncludeDelta'=1, 'IncludeEta'=1, 'OutputSE'=1)
 
-# icov: Include covariates for Bernoulli sampling model?  (1=No, 2=Yes)
-# ib: Include preferential sampling parameters? (1=No, 2=Yes)
-for(icov in 1:2){
+
+for(icov in 1:3){
   for(ib in 1:3){
     # Data
     Data = list("Options_vec"=Options_vec, "c_i"=c_i, "P_i"=Prop_sampled,"A_s"=1-Grid.new@data[,"land_cover"],"s_i"=s_i-1, "y_s"=y_s, "spde"=spde)
     if(icov==1)Data$X_sj=Data$X_sk=matrix(1,nrow=n_cells)
     if(icov>1){
       Data$X_sj=cbind(1,x_s_z)
-      Data$X_sk=cbind(x_s_z)
+      Data$X_sk=cbind(1,x_s_y)
     }   
     if(ib<3)Data$X_sb=matrix(1,nrow=n_cells)
     if(ib==3)Data$X_sb=cbind(x_s_b)
@@ -100,21 +99,20 @@ for(icov in 1:2){
       Map[["beta_b"]] = factor(rep(NA,length(Params[["beta_b"]])))
     }
     # don't estimate fixed effects for sampling model if no covariates are modeled
-    if(icov==1) Map[["beta_k"]] = factor(rep(NA,length(Params[["beta_k"]])))
+    #if(icov==1) Map[["beta_k"]] = factor(rep(NA,length(Params[["beta_k"]])))
     
     # Make object
     #compile( paste0(Version,".cpp") )
-    #dyn.load( dynlib(Version) )  #don't need when DLL specified below and cpp file is in src directory
+    #dyn.load( dynlib(Version) )
     Start_time = Sys.time()
     Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE, DLL="PrefSampling")
     Obj$fn( Obj$par )
     
     # Run
-    Lower = -Inf
-    Upper = Inf
+    Lower = -50
+    Upper = 50
     Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, lower=Lower, upper=Upper, control=list(trace=1, maxit=1000))         #
     Opt[["diagnostics"]] = data.frame( "Param"=names(Obj$par), "Lower"=-Inf, "Est"=Opt$par, "Upper"=Inf, "gradient"=Obj$gr(Opt$par) )
-    Opt[["IC"]] = c("AIC"=2*Opt$objective+2*length(Opt$par))
     Report = Obj$report()
     
     # Potentially fix random fields with zero sample or population variance
@@ -137,8 +135,8 @@ for(icov in 1:2){
       }
       Data$Options_vec[Which+2] = 0
       # Re-run
-      if( length(Which)!=2 ) Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE)
-      if( length(Which)==2 ) Obj = MakeADFun( data=Data, parameters=Params, random=NULL, map=Map, silent=TRUE)
+      if( length(Which)!=2 ) Obj = MakeADFun( data=Data, parameters=Params, random=Random, map=Map, silent=TRUE,DLL="PrefSampling")
+      if( length(Which)==2 ) Obj = MakeADFun( data=Data, parameters=Params, random=NULL, map=Map, silent=TRUE,DLL="PrefSampling")
       Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, lower=Lower, upper=Upper, control=list(trace=1, maxit=1000))         #
       Opt[["diagnostics"]] = data.frame( "Param"=names(Obj$par), "Lower"=-Inf, "Est"=Opt$par, "Upper"=Inf, "gradient"=Obj$gr(Opt$par) )
     }
@@ -146,32 +144,30 @@ for(icov in 1:2){
     # SD
     #Report = Obj$report()
     SD=sdreport(Obj,bias.correct=TRUE)
-
     Out=list(Opt=Opt,SD=SD,Report=Report)
-    fname=paste0(TmbFile,"./OutBearded_cov",icov,"_b",ib)
-    save(Out,file=paste0(fname,".RData"))
-    capture.output( Out[c("Opt","SD")],file=paste0(fname,".txt"))
+    fname=paste0("./OutBearded_cov",icov,"_b",ib,"ice0.RData")
+    save(Out,file=fname)
   } 
 }
 
 #plot map of estimates
 str1='./OutBearded_cov'
-load(paste0(str1,2,"_b",1,".Rdata"))
+load(paste0(str1,2,"_b",2,"ice0.Rdata"))
 Out$SD$value[1:10]
 library(RColorBrewer)
 library(ggplot2)
 myPalette=colorRampPalette(brewer.pal(9, "Purples")) 
 #n.fixed.eff=ncol(x_s_z)+2
 n.fixed.eff=4
-N.spat=matrix(Out$SD$value[(n.fixed.eff+3):(n_cells+n.fixed.eff+2)],ncol=1)
+N.spat=matrix(Out$SD$unbiased$value[(n.fixed.eff+3):(n_cells+n.fixed.eff+2)],ncol=1)
 Ests = plot_N_map(cur.t=1,N=N.spat,Grid=Grid.new,myPalette=myPalette)
 Ests=Ests+ggtitle("B. Modeled abundance")+theme(plot.title = element_text(hjust = 0,size = rel(1)))
 
 
 #plot counts in surveyed cells
 myPalette=colorRampPalette(brewer.pal(9, "Blues")) 
-Sampled=rep(NA,n_cells)
-Sampled[Mapping]=Count.data[,"Count"]
+Sampled=rep(NA,length(Grid.new))
+Sampled[Mapping[1:394]]=Count.data[1:394,"Count"]
 Counts = plot_N_map(cur.t=1,N=Sampled,Grid=Grid.new,myPalette=myPalette,leg.title="Count")
 Cur.df=cbind(data.frame(gCentroid(Grid.new,byid=TRUE)),Counts=Sampled)
 new.colnames=colnames(Cur.df)
@@ -189,11 +185,6 @@ Counts=Counts + geom_polygon(data=Russia_points,fill="tan",aes(long,lat,group=gr
 Counts=Counts+coord_cartesian(xlim=c(-100000,1500000),ylim=c(-3700000,-2500000))
 Counts=Counts+ggtitle("A. Seal counts")+theme(plot.title = element_text(hjust = 0,size = rel(1)))
 Counts
-
-#Counts=Counts+ggtitle("")
-pdf(file="bearded_counts.pdf")
-Counts
-dev.off()
 
 #ggplot(AK_points)+geom_polygon(aes(long,lat,group=group))
 #Grid.new@data$Count=Sampled

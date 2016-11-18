@@ -13,6 +13,8 @@
 \def\bftheta{{\ensuremath\boldsymbol{\theta}}}
 \def\bfeta{{\ensuremath\boldsymbol{\eta}}}
 \def\bfdelta{{\ensuremath\boldsymbol{\delta}}}
+\def\bfnu{{\ensuremath\boldsymbol{\nu}}}
+\def\bfmu{{\ensuremath\boldsymbol{\mu}}}
 \def\bfSigma{{\ensuremath\boldsymbol{\Sigma}}}
 \def\bfB{\textbf{B}}
 \newcommand{\VS}{V\&S}
@@ -29,7 +31,7 @@
 %  IMPORTANT -- place the \title, \author, etc, \begin{summary}...
 %  \end{summary} \keywords statements in the order demonstrated below
 \rm
-Here, we provide line by line responses to associate editor and reviewer comments, suggestions, and edits.  For completeness, we include all reviewer comments in addition to our responses (our responses are in blue).  We have also included responses to additional comments we received from a quantitative ecologist (Mark K\'{e}ry) that we hope will improve presentation to non-statisticians.  In addition to these responses, we provide a marked up PDF version of our manuscript showing all changes made.
+Here, we provide line by line responses to associate editor and reviewer comments, suggestions, and edits.  For completeness, we include all reviewer comments in addition to our responses (our responses are in blue).  In addition, our revision includes copy editing corrections from our editorial office and some clarifications in response to additional comments we received from an interested reader. We provide a marked up PDF version of our manuscript showing all changes made.
 
 \section{Associate editor}
 
@@ -37,7 +39,7 @@ Here, we provide line by line responses to associate editor and reviewer comment
 In view of the comments received, I must decline your manuscript for publication in the Methods in Ecology and Evolution at this time.  However, we would be willing to consider a new manuscript which takes into consideration these comments. In addition to the other comments, I would ask you to try to make the presentation more accessible to an ecological audience - as you put it in the context of SDMs, I think it should really be understandable by ecologists working with SDMs. I appreciate that this can be difficult.
 
 \textcolor{blue}{
-We thank the associate editor for the invitation to resubmit, and for their constructive criticism.  In our revision, we have made an effort to make the manuscript more accessible to quantitative ecologists and to those working in the SDM modeling field.  It is unfortunate that there seems to be a different set of traditions (and jargon) between those working in the scientific survey world (e.g., planned surveys of occupancy and abundance), and those working with presence-only data.  Admittedly, there are different challenges in each, but it can make cross-communication somewhat difficult.  In the attached we've tried to emphasize relationships between the two fields and to locate or work within the broader sphere of SDM modeling.}
+We thank the associate editor for the invitation to resubmit, and for their constructive criticism.  In our revision, we have made an effort to make the manuscript more accessible to quantitative ecologists and to those working in the SDM modeling field.  We provide numerous examples below.}
 
 To give one example, you wrote (p4, l78-80):
 ``For instance, PS can occur when the investigator uses a priori knowledge or observations of the state variable obtained during sampling to allocate survey effort in places where abundance or occurrence is known to be high."
@@ -55,6 +57,11 @@ Albert, C. H., N. G. Yoccoz, T. C. Edwards, C. H. Graham, N. E. Zimmermann, and 
 Edwards, T. C., D. R. Cutler, N. E. Zimmermann, L. Geiser, and G. G. Moisen. 2006. Effects of sample survey design on the accuracy of classification tree models in species distribution models. Ecological Modelling 199:132-141.
 
 \textcolor{blue}{We thank the editor for pointing us to these articles - our knowledge of the species distribution modeling literature is admittedly a little lacking.  These papers are certainly germane to the present study, and we have included additional material in the introduction (2nd paragraph) that talks about (1) implications of design vs. model-based inference, and (2) the importance of the particular objective function (e.g., minimizing variance, estimating species-habitat relationships) for optimal design.}
+
+Additionally, we have made the following changes to try to make the manuscript accessible to a wider audience:
+\begin{itemize}
+  \item 
+\end{itemize}
 
 \section{Reviewer 1}
 
@@ -136,28 +143,93 @@ be the notation you use throughout given the section header. Your specication fo
   We have replaced the Poisson observation model with a binomial one in eqn 4 to make this clearer, and have indicated dependence on $Z_i$ through conditioning.  The reason that we had the Poisson in there originally is that the models we fit to data use the fact that the marginal distribution for $Y_i$ given the Poisson-Binomial mixture is itself a Poisson distribution.  However, we think it will be clearer to present the model hierarchically at this stage and then to describe our marginalization (something many ecologists may not care about) when describing software.  We have created a new ``Software" methods subsection which describes this in greater detail. Importantly, we describe how predictions are made; when detection probability is equal to 1.0, predictions are made using the formulation $\hat{N}_i = Y_i + (1-A_i)\exp(\hat{\mu}_i)$.  This framework incorporates a finite population correction and is similar to that employed by \citet{JohnsonEtAl2010} in the context of point process likelihood analysis of distance sampling data.  It also prevents predicted abundance in a cell from being less than the observed count.
 }
 
+On line 61, you indicate $\bfmu$ and $\bfnu$ represent log-scale abundance (associated with {\bf Z}) and the logit of the probability of sampling (associated with {\bf R}). For equation 5, however, you use $\bfmu_i$ to represent the mean value of a Gaussian process, which created some confusion. You might consider more generally allowing $\bfmu$ to be a function of covariates influencing the state variable of interest, and $\bfnu$ to be a function of covariates
+influencing placement of sampling locations. You could then replace $\psi_i$ in equation 6 with $\nu_i$, which would make it immediately clear you were discussing factors influencing the probability of site placement.
 
-
-\section{Additional reviewer: Marc K\'{e}ry}
-
-I read your ms and found it very stimulating and also well-written. Just a couple of minor comments which I noted during my reading.
--          P.3, eq. 4: why do you put a Poisson observation model here ? In particular, since the Poisson has no “ceiling”, p cannot be detection probability but must be a detection rate, i.e., the combination of false-positive and false-negative errors. I note that in the Appendix 1 you have the usual Binomial observation model
-
-\textcolor{blue}{This was also noted by Reviewer 1. There are two alternatives here.  In the first, one can use some sort of simulation-based inference (e.g. MCMC) to model both components of the hierarchy (i.e. $[{\bf Z}|\bftheta]$ and $[{\bf Y}|{\bf Z}]$), in which case one could specify $[{\bf Z}|\bftheta]$ to be Poisson and $[{\bf Y}|{\bf Z},p]$ to be binomial.  Keeping track of the latent $Z_i$s, one then has an entirely coherent model for abundance.  However, from a computational standpoint, it is much easier to deal with the unconditional distribution $[{\bf Y}|\bftheta,p]$.  If $\bftheta$ are the expectations of ${\bf Z}$, then unconditionally $[{\bf Y}|\bftheta,p] = \text{Poisson}(\bftheta p)$ (apologies for a little sloppiness in notation here).   From a computational standpoint, the Poisson distribution is much easier to deal with, as one can bring the TMB machinery into the analysis (in particular, since it works with derivatives, it can't handle discrete random effects). The inference about the parameters $\bftheta$ should be completely coherent. The disadvantage is that one must then predict the latent ${\bf Z}$ parameters: e.g. once we have conducted inference relative to $\bftheta$, one must then predict $Z_i \sim \text{Poisson}(\theta_i)$. This isn't perfect, as we could potentially have the case that the predicted $Z_i$ is actually less that the count $Y_i$.  However, it should be a reasonable approximation, especially when focus is on absolute abundance (i.e. $\sum Y_i$) and will actually be a good approximation at the individual cell level whenever $Z_i$ is large and $p$ is small (e.g., when only a small fraction of each survey unit is sampled, as in the bearded seal example).  We note that a) this strategy of inference has been used in several recent applications with good results (e.g. \cite{ThorsonEtAl}, and b) the simulation results suggest this procedure is unbiased (see Fig. 4, Independent estimation model, $b=0$ case).  Note that in simulations, we did generate data as $[{\bf Z}] = \text{Poisson}$ and $[{\bf Y} | {\bf Z}] = \text{Binomial}$.  We now discuss this tradeoff more explicitly, both in Appendix S1 and in the Discussion.
+\textcolor{blue}{
+  We appreciate the reviewer's attempt to help us streamline notation and to make things clearer for the reader.  We have implemented the basic premise of this idea, although some of the particulars differ from the reviewer's suggestion.  Specifically we now describe $\bfmu$ and $\bfnu$ as indicating ``the link-scale process of interest and the logit of the probability of sampling, respectively.  As with $\bfmu$, this would mean $[Z_i] = f(\exp(\mu_i))$, whereas the distribution of sampling locations can be represented as $[R_i] = f(\text{logit}^{-1}(\nu_i))$, where $\mu_i$ and $\nu_i$ can be written as functions of regression coefficients, habitat covariates, and spatially autocorrelated random effects."  Then in the next section we use $\mu_i$ in eq. 5 and $\nu_i$ in eq. 6, although we retain $xi_i$, since in the next section we also wish to write $\nu_i$ in terms of shared spatial effects.  This is all a little tricky, in that the \citet{DiggleEtAl2010} paper considers a continuous support model (whereas ours is discrete), and the structure is slightly different.  Admittedly, maintaining recognizable notation while keeping precise definitions is a challenge.
 }
 
-Line 68: What are platforms of opportunity ? perhaps sea mammal jargon ? Hard to understand for non-sea-mammal guys like myself
+I understand the model you are specifying under the ``simulation study" subheading, but the notation is
+different from that presented in the rest of the paper (i.e., use of ``=" vs. ``$\sim$"). I have no preference for
+the notation used, but it seems like consistent notation would be more reader friendly. The same comment
+holds true for the model presented under the subheading ``bearded seal count surveys".
 
-\textcolor{blue}{This is a good point - it is actually marine mammal jargon (for example, U.S. military ships providing locations where whale observations are made opportunistically).  We deleted this term, replacing it with ``opportunistic sampling."}
+\textcolor{blue}{
+  We agree.  We've changed all distributions to brackets and have eliminated the ``$\sim$" notation.
+}
 
+Finally, your definition of $Z_i$ in the ``bearded seal count surveys" section seems inconsistent with the general
+definition of $Z_i$ at the beginning of your manuscript. I think of state variables as presence / absence,
+abundance, survival, etc. This definition for $Z_i$ seems more closely related to the expected value of a state
+process.
 
--          Line 139: doesn’t setting beta-star-0 to zero imply that the probability of a sample unit to be surveyed is fixed at 1 for the average environmental conditions (if covariates are centred) ?
--          168: lest
--          199: I would say “and estimates are not reported here”
--          209 and 211: fig. instead of Fig
--          317: typo
--          Fig. 1: main title left: Coarse scale
--          Fig. 4, legend: since you’re doing ML you may briefly comment on why you have a posterior mode here ? Presumably some application of Bayes rule for empirical Bayes estimates ?
+\textcolor{blue}{
+  We've rewritten the model here in terms of the Poisson-binomial hierarchical mixture.  In the following ``Software" section, we then indicate that we marginalize over $\bfZ$ when performing ML inference.
+}
+
+{\bf Other Comments}
+
+Line 65: This sentence seems to discount the value of good study design, which is still important for model-
+based estimation.
+
+\textcolor{blue}{
+We've altered text to be a little less cavalier, now stating that 
+``Design-based estimation requires that surveys rely on a pre-planned survey design selected probabilistically from an underlying sampling frame \citep{Cochran1977}.  Although randomization can increase legitimacy, model-based estimation is not formally subject to this requirement."
+}
+
+Line 77: It's unclear to me why the distinction between fine and coarse-scale preferential sampling is important. They both seem to represent the process of dependence between sampling locations and the process
+of interest.
+
+\textcolor{blue}{
+As the size of the sampling unit decreases (with the limit being a point process model in continuous space) there is indeed little difference.  But practically, it seems likely that one could use a reasonable design to select sampling units, but still open themselves to bias if they target non-representative habitat.  However, this point is well taken, and we don't think the distinction necessarily needs to prominence that we've given it.  We now address this topic for the first time in the discussion.
+}
+
+Line 86: I do not see how the definition offered here differs from your initial description of preferential
+sampling, unless the environmental covariate associated with the probability a location is selected is itself
+independent from the state variable of interest, which seems unlikely in general.
+
+\textcolor{blue}{
+This is an extremely important point that we may have failed to get across.  Selecting sampling units based on a covariate related to abundance is just fine, \textit{provided} that the covariate is also used in the model for animal density/occurrence. In essence, we really only have preferential sampling if there the probability of sampling is related to the residuals (say $\hat{N_i} - N$) from a fitted SDM.  We've produced an additional figure (now fig. 1) that attempts to provide intuition about the distinction between sampling that is covariate-dependent and sampling that is preferential.
+}
+
+Line 186: I understand why you fit a relatively simple abundance model in this case. However, given the
+difficulties you encountered in incorporating even modestly complex structure on B, how well do you suppose
+your model will perform when you attempt to correct for nuisance processes?
+
+\textcolor{blue}{
+We don't know the answer to this question, although it seems like an important one.  In the discussion, we now suggest this as a topic for future research.
+}
+
+Line 195: You only describe 4 models below, not 6.
+
+\textcolor{blue}{Changed}
+
+Simulation study results: can you report bias for other parameters (e.g. slope parameters) in your model,
+even if this is relegated to an appendix?
+
+\textcolor{blue}{Yes, we have created an additional appendix table (S3) that summarizes bias in $b$ (the preferential sampling parameter), as well as bias in the species-habitat parameters.  We don't look at bias in the sampling probability parameters because data were simulated by sampling without replacement (with a fixed number of sampled survey units), whereas the fitted model was Bernoulli (which assumes the number of sampled units is random).  Thus parameters would not be directly comparable.  We also provide convergence statistics in this appendix. %We note that the bias in the slope parameter of the species-habitat relationship %is likely because of the well-known confounding that occurs between regression %coefficients and spatially autocorrelated random effects in spatial models %\citep[e.g.][]{ReichEtAl2006,HodgesReich2010}.
+}
+
+Paragraph starting on line 219: I find this paragraph very confusing. In particular, it is unclear to me exactly
+what you mean when you state you ``...refitted $M_{cov=1;b=0}$ to produce an estimate of apparent abundance
+without this feature. Specifically, we refitted the model with 20 pseudo-absences in this portion of the study
+area to better inform abundance-covariate relationships". Does Fig. 5 reflect this re-fitted model? Why not
+fit all models in this manner for consistency?
+
+\textcolor{blue}{We now include these known zero values in all models.}
+
+Line 225: a model-averaged estimate of abundance?
+
+\textcolor{blue}{After correcting the link function in present model runs, it no longer makes sense to present a model-averaged estimate.}
+
+Table 1: I find these tables are easier to read if models are listed in decreasing order of $\Delta$AIC.
+
+\textcolor{blue}{We now present models in order of $\Delta$AIC.}
+
+Fig. 3: In my version, the blue and green dashed lines do not show up in the legend.
+
+\textcolor{blue}{Strange, this is not the case in our version.  Guessing it is an issue with PDF compilation on the MEE submission website.  We'll work with copy editors to ensure it looks right as it heads into production.}
 
 
 \bibliography{master_bib}
