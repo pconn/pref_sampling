@@ -1,0 +1,352 @@
+% besdoc.tex V1.0, 17 March 2011
+
+\documentclass[times,mee,doublespace,]{besauth2}
+%%\documentclass[times,mee,]{besauth}
+
+\newcommand{\journalnamelc}{British Ecological Society}
+\newcommand{\journalabb}{British Ecological Society}
+\newcommand{\journalclassshort}{BES}
+%%\newcommand{\journalname}{British Ecological Society}
+\usepackage{epstopdf,comment}
+
+\usepackage{moreverb}
+
+\usepackage[colorlinks,bookmarksopen,bookmarksnumbered,citecolor=red,urlcolor=red]{hyperref}
+
+
+\usepackage{lineno}
+
+\newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
+T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\bibpunct[; ]{(}{)}{;}{}{}{,}
+
+\def\volumeyear{2017}
+\def\VOC{VO}
+
+\begin{document}
+\runningheads{P.~B.~Conn, J.~T.~Thorson, \& D.~S.~Johnson}{Preferential sampling in spatial distribution models}
+
+\papertype{Article}
+
+\title{Confronting preferential sampling when analyzing population distributions: diagnosis and model-based triage \footnotemark[2]}
+
+\author{Paul B. Conn\affil{1}\corrauth, James T. Thorson\affil{2}, Devin S. Johnson\affil{1}}
+
+
+\address{\affilnum{1}Marine Mammal Laboratory, Alaska Fisheries Science Center, NOAA, National Marine Fisheries Service, 7600 Sand Point Way NE, Seattle, WA 98115 USA; \affilnum{2} Fisheries Resource Assessment and Monitoring Division (FRAM), Northwest Fisheries Science Center, NOAA, National Marine Fisheries Service,
+2725 Montlake Boulevard E, Seattle, WA 98112, USA}
+
+\corraddr{paul.conn@noaa.gov}
+
+\begin{abstract}
+ %\noindent {\emph{Summary}}
+\small
+\begin{enumerate}
+\item  Population surveys are often used to estimate the density, abundance, or distribution of natural populations. Recently, model-based approaches to analyzing survey data have become popular because one can more readily accommodate departures from pre-planned survey routes and construct more detailed maps than one can with design-based procedures.
+
+\item Spatial models for population distributions often make the implicit assumption that locations chosen for sampling and animal abundance at those locations are conditionally independent given modeled covariates.  However, this assumption may be violated when survey effort is non-randomized, leading to preferential sampling.
+
+\item We develop a hierarchical statistical modeling framework for detecting and alleviating the biasing effects of preferential sampling in spatial distribution models fitted to count data.  The approach works by specifying a joint model for population density and the locations selected for sampling, and specifying a dependent correlation structure between the two processes.
+
+\item Using simulation, we show that moderate levels of preferential sampling can lead to large (e.g. $40\%$) bias in estimates of animal density and that our modeling approach can considerably reduce this bias.  In contrast, preferential sampling did not appear to bias inferences about parameters informing species-habitat relationships (i.e. slope parameters).
+
+\item We apply our approach to aerial survey counts of bearded seals (\textit{Erignathus barbatus}) in the eastern Bering Sea. As expected, models with a preferential sampling effect led to lower abundance than those without. However, several lines of reasoning (better predictive performance, higher biological realism) led us to prefer models without a preferential sampling effect for this data set.
+
+\item When population surveys break from traditional scientific survey design principles, ecologists should recognize the potentially biasing effects of preferential sampling when estimating population density or occurrence. Joint models, such as those described in this paper, can be used to test and correct for such biases. However, such models can be unstable; ultimately the best way to avoid preferential sampling bias is to incorporate design-based principles such as randomization and/or systematic sampling into survey design.
+\end{enumerate}
+
+
+ Word count: 6038
+\end{abstract}
+
+\keywords{count data, population survey, preferential sampling, spatial autocorrelation, spatial distribution model, species distribution model}
+
+\maketitle \linenumbers
+
+\def\VAR{{\rm Var}\,}
+\def\COV{{\rm Cov}\,}
+\def\Prob{{\rm P}\,}
+\def\bfX{\bf X}
+\def\bfbeta{\boldsymbol{\beta}}
+\def\bfdelta{\boldsymbol{\delta}}
+\def\bfeta{\boldsymbol{\eta}}
+\def\bfnu{\boldsymbol{\nu}}
+\def\bfmu{\boldsymbol{\mu}}
+
+
+\section{Introduction}
+
+
+Ecologists often fit statistical models to data from surveys of natural populations (e.g., plants, animals) to explain variation in species distributions and to predict presence or abundance in unsampled areas. Such models may serve as the basis for testing ecological theory \citep{HilbornMangel1997,Austin2007}, for directed conservation and management \citep{WilliamsEtAl2002,NicholsWilliams2006}, or for monitoring biological diversity \citep{PereiraCooper2006,YoccozEtAl2001}.  Depending on the application, data quality can vary widely, ranging from scientific survey data to opportunistic records of species presence reported by the public.
+
+Where possible, researchers often use sound survey design principles (e.g. randomization) to ensure unbiased inference when implementing scientific surveys.  For instance, under protocols such as simple, systematic, or stratified random sampling, design-based estimators of average density or presence-absence over large survey regions are guaranteed to be unbiased and avoid making assumptions about the factors influencing density or distribution \citep{Cochran1977,BucklandEtAl2000}.  However, spatial resolution is typically poor for such estimators, limiting the breadth of ecological and management questions that can be addressed. Further, for logistical reasons, many ecological surveys simply cannot afford to be this rigorous in their design.  For example, even the North American Breeding Bird Survey uses roads and other non-random features that necessitate use of alternate estimation procedures \citep{SauerLink2011}.
+
+Over the last decade, there has thus been a huge surge in research describing model-based procedures for estimating abundance, density, or presence-absence from population survey data.  In contrast to design-based procedures, model-based procedures make explicit assumptions about how populations vary over space, both in terms of explanatory variables and often in terms of distribution.  For instance, in such applications, it is common to use habitat or environmental covariates together with spatial effects (e.g. via trend surfaces or spatial random effects) to predict density or distributions across the landscape. This approach can be useful for fine-scale management, identifying range shifts, and comparing the fit (or lack thereof) of alternative models that express different ecological hypotheses \citep{Austin2007}.  We shall refer to the amalgam of model-based approaches for making spatially explicit inference about natural populations as ``spatial models for population distributions" (SMPDs).  Ultimately, the quality of inference from SMPDs depends on several factors, including (i) how well the fitted model approximates reality, and (ii) the quality of the data \citep{BucklandEtAl2000}.  
+
+The radiation of model-based approaches has proceeded at different rates and pathways in different ecological modelling subfields, which are often linked to the data being modeled.  For instance, species distribution models \citep[SDMs; ][]{ElithLeathwick2009} are often used to predict species presence as a function of habitat variables and encompass both statistical (e.g. generalized linear or generalized additive models) and machine learning algorithms. The term SDM also connotes analysis of presence-only data (as available from museum collection or citizen science programs for instance).  In the field of population assessment, statistical models are almost exclusively used, often with observation models tailored to the sampling approach (e.g. presence-absence surveys, distance sampling, quadrat samples, point counts).  In this paper, our perspective is one shaped more heavily by the population assessment literature, though we expect our general approach to be applicable to a wider variety of SMPDs.
+
+One of the main advantages of using SMPDs is that one can potentially use data from non-randomized designs or opportunistic sampling to make inferences about animal populations \citep{JohnsonEtAl2010}. Several authors have shown that non-randomized designs can have poorer predictive ability than randomized designs when used to estimate species distributions \citep[e.g.][]{EdwardsEtAl2006,AlbertEtAl2010}, but that the optimal design may depend on the question of interest.  For instance, the optimal design may differ depending on whether the inferential goal is to maximize predictive ability or to estimate the relationship between species presence and important habitat covariates \citep{AlbertEtAl2010}.
+
+Less precise predictions may be a sacrifice one is willing to make if it is the only cost incurred when using data at non-random locations to make inferences about species distributions.  After all, such data are often all that are available for certain taxa and locations (e.g. from citizen science programs), and are certainly less expensive to acquire than data from randomized, scientific surveys.  However, recent research suggests that one may be opening oneself up to bias as well, which is potentially much more concerning than loss of precision. In a recent paper, \citet{DiggleEtAl2010} emphasized that spatially explicit statistical models can easily provide biased estimates when sampling disproportionately targets locations where the response of interest is higher (or lower) than expected given a particular set of explanatory covariates.  In the context of SMPDs, this might occur if sampling disproportionately occurs in locations where animals are known to be present or of high abundance. For example, if volunteer inventory participants have access to multiple sites with similar covariate values, bias might arise if they consistently choose sites where species are thought or known to be present.  Bias might also arise if survey effort is higher near bases of operations or features such as roads, particularly if animal abundance is higher (or lower) near these locations than elsewhere in the landscape.  In our view, this phenomenon, termed ``preferential sampling," is potentially much more problematic, because estimates of animal abundance and occurrence from SMPDs could be severely overstated.
+
+In this article, we explore potential for bias in SMPDs resulting from preferential sampling (hereafter, PS) and describe several model-based approaches for detecting and correcting for such biases.  We start by describing a common currency for notation and basic model structures considered in this paper.  Second, we review PS bias in a mathematical light, and describe prior approaches to coping with its effects. Third, we introduce a novel generalization of previously proposed PS models, allowing the investigator to jointly model animal encounter data and the locations chosen for sampling, including possible dependence structure between these two types of observations.  Fourth, we conduct a simulation study to examine the performance of traditional SDMs and our newly developed PS model when data are gathered preferentially.  Finally, we demonstrate our modeling approach by analyzing aerial survey counts of bearded seals (\textit{Erignathus barbatus}) in the Bering Sea.
+
+
+\section{Materials and methods}
+
+
+\subsection{Notation and basic model structures}
+
+We focus here exclusively on discrete space (areal) models for population survey data, although we note that PS is likely to affect analyses similarly regardless of the choice of spatial domain.  We suppose that the investigator intending to fit a SMPD to survey data breaks their study area up into $S$ survey units (label these $U_1, U_2, \hdots, U_S$), of which $n$ are sampled (call the set of sampled locations $\mathcal{S}$). Each survey unit $i$ is assigned a vector of covariates, ${\bf x}_i$, and an indicator $R_i$ that takes on the value 1.0 if location $i$ is sampled (i.e. if $U_i \in \mathcal{S}$), and is 0 otherwise.  To formulate a ``traditional" SMPD, one could then write abundance or occurrence as a stochastic realization of a probability mass function $f()$:
+\begin{eqnarray}
+  \label{eq:process}
+  [Z_i] & = & f(g^{-1}(\mu_i)),
+\end{eqnarray}
+where we use the bracket notation ($[\cdot]$) to denote a probability distribution (density) function.  In this example, $Z_i$ denotes the state variable of interest (e.g. occupancy or abundance), $g()$ is a link function (e.g. probit or logit for occupancy, log for count data), and $\mu_i$ is a link-scale intensity value which can itself be written as a function of habitat covariates, regression coefficients, and spatially autocorrelated random effects.  Spatially autocorrelated random effects are often included to allow populations to vary smoothly in space and to account for residual patchiness not explained by predictive covariates \citep{Legendre1993,LichsteinEtAl2002}. In applications described in this paper, we write the intensity as
+\begin{eqnarray}
+\mu_i & = & \beta_0 + {\bf x}_i \boldsymbol{\beta}+\delta_i,
+ \label{eq:mu}
+\end{eqnarray}
+where $\beta_0$ is an intercept parameter, ${\bf x}_i$ is a row vector of $m$ predictive covariates associated with site $i$, $\boldsymbol{\beta} = \{ \beta_1, \beta_2, \hdots, \beta_m \}$ is a column vector of $m$ regression parameters, and $\boldsymbol{\delta}=\{ \delta_1,\delta_2,\hdots,\delta_S \}$ are spatially autocorrelated random effects.  For occupancy, $f()$ would typically be Bernoulli, while the Poisson or negative binomial are typically choices for analysis of count data; common forms for $\delta_i$ include geostatistical specifications \citep{Cressie1993,DiggleEtAl1998}, Gaussian Markov random fields \citep[e.g. conditionally autoregressive models;][]{RueHeld2005}, or low rank alternatives such as predictive process \citep{BanerjeeEtAl2008,LatimerEtAl2009} or restricted spatial regression models \citep{ReichEtAl2006,Hughes2013}.
+
+The model for $Z_i$ describes variation in the process of interest and is often described as the ``process'' model.  However, it is usually impossible to conduct a complete census of all individuals present in a surveyed location, so it is customary to include an observation model describing incomplete detection.  For occupancy (presence/absence) studies, the response variable is $Y_i = 1$ if the species of interest is detected and is 0 otherwise, and is modeled with a Bernoulli distribution \citep{Royle2008}:
+\begin{eqnarray}
+  [Y_i|Z_i] & = & \text{Bernoulli}(Z_i p_i).
+\end{eqnarray}
+ Here, the detection probability $p_i$ is possibly a function of survey and observer specific covariates (e.g. visibility, observer experience). Replicate surveys of the same sampling unit provide the necessary information to estimate $p_i$ \citep{MacKenzie2002}.   For count surveys, a possible model is
+\begin{eqnarray}
+  \label{eq:obs_binomial}
+  [Y_i|Z_i] & = & \text{Binomial}(Z_i, A_i p_i),
+\end{eqnarray}
+where the $Y_i$ now represents the count of animals obtained while surveying unit $i$, $A_i$ denotes the proportion of sample unit $i$ that is surveyed, and $p_i$ gives detection probability.  Additional information will often be needed to estimate $p_i$ in this context, such as data from double observers, distance observations, or double sampling \citep[see e.g.][]{BucklandEtAl2001,Royle2004,Borchers2006,ConnEtAl2014}.
+
+For the remainder of this treatment, we use bold symbols to denote vector-valued quantities or matrices.  We also use ``$|$" to specify that a distribution is conditional; for instance, if $[{\bf Y}]$ denotes the marginal probability mass function for ${\bf Y}$, then  $[{\bf Y}|{\bf Z}]$ represents the conditional distribution of ${\bf Y}$ given ${\bf Z}$.  We use $\bfmu$ and $\bfnu$ to indicate the link-scale process of interest and the logit of the probability of sampling, respectively.  For population abundance, this would mean $[Z_i] = f(\exp(\mu_i))$, whereas the distribution of sampling locations can be represented as $[R_i] = f(\text{logit}^{-1}(\nu_i))$, where $\mu_i$ and $\nu_i$ can be written as functions of regression coefficients, habitat covariates, and spatially autocorrelated random effects.  We use the notation $Z_i$ when describing the process model in general terms, but often switch to the conventional notation $N_i$ when animal abundance is the explicit focus of interest.
+
+\subsection{Preferential sampling: A primer}
+
+Design-based estimation requires that surveys adhere to a pre-planned survey design selected probabilistically from an underlying sampling frame to ensure unbiasedness \citep{Cochran1977}.  Although randomization can reduce potential for bias, researchers often view SMPDs in a different light, where the data gathering procedure is not important as long as the models being fitted are formulated well and produce reasonable predictions (see \textit{Discussion} for more on this topic).  Under this view, investigators can reallocate effort if weather or logistics preclude surveying in a desired location and still generate model-based estimates of abundance or occupancy.  This can be a crucial advantage in surveys covering large areas with frequent inclement weather.  It also opens the door for using presence-only, citizen science, or opportunistically collected data for estimation.
+
+However, the manner in which effort is allocated can potentially have profound influence on SMPD estimator performance.   Preferential sampling (PS) arises when the locations being sampled and the process of interest (e.g. density, occupancy) are conditionally dependent given modeled covariates \citep{DiggleEtAl2010}.  For instance, PS can occur when the investigator tends to sample more in places where a species has already been observed, or is known to be abundant. \citet{DiggleEtAl2010} showed that this type of PS can lead to bias when this extra information is not included in models for the state variable of interest.  Specifically, PS arises when we consider the set of sampled locations as stochastic and when $[{\bf R},{\bf Z} | {\bf x}] \neq [{\bf R}|{\bf x}][{\bf Z}|{\bf x}]$, where \textbf{R} is an indicator vector whose elements $R_i$ are 1.0 if sampling unit $i$ is sampled and are zero otherwise (see e.g. fig. \ref{fig:PS_example}).  We use this definition of PS throughout the rest of the manuscript, noting that it is somewhat different than has sometimes been used in the SDM literature.  For instance, \citet{MerckxEtAl2011} use the term ``preferential sampling" to refer to the process of visiting some sites more often than others, while \citet{ManceurKuhn2014} define it as occurring when the locations selected for sampling are a function of an environmental covariate.  Neither of these latter conditions are problematic outside of the specialized field of presence-only modelling.
+
+\citet{DiggleEtAl2010} demonstrated PS with an environmental monitoring problem, whereby pollutant monitoring stations were more highly clustered around urban areas with high concentrations of pollutants than in rural areas with comparably low levels of pollutants.  Fitting simple geostatistical models without fixed effects led to positively biased estimates of landscape-level pollutant concentrations.  Presumably (and as noted by discussants of the article) including a fixed effect associated with a relevant covariate (e.g. a development index) would likely reduce or eliminate bias.  However, the primary point of \citet{DiggleEtAl2010} is well taken: inclusion of spatially autocorrelated random effects in a statistical model is insufficient to remove the potentially biasing effects of PS.
+
+As in the pollution example, having good explanatory covariates may also reduce bias when fitting SMPDs to population survey data under PS (e.g. fig. \ref{fig:PS_example}).  However, in many ecological applications, predictive covariates explain only a small portion of variation present in the data.  If the locations selected for sampling are a function of some unmodelled factor related to abundance (intentionally or unintentionally), bias may still occur.  Despite the clear potential for bias in SMPDs, there are few examples where PS \citep[\textit{sensu}][]{DiggleEtAl2010} is discussed with regard to SMPDs.  One exception is
+\citet{ChakrabortyEtAl2010}, who acknowledged the likely presence of PS when fitting SMPDs to data obtained using nonrandomized designs.  However, they did not attempt to account for PS in their models.
+
+In design-based sampling, unequal sampling intensity is often accommodated via stratification or unequal probability sampling, as with Horvitz-Thompson-like estimators where the probability of inclusion varies by sampling unit \citep{Cochran1977}.  However, in the case of PS, this inclusion probability also depends on the value of the response associated with the sampling unit.  Evidently, any approach to account for PS should also account for the dependence between the process of interest and the locations chosen for sampling.
+
+Several authors have attempted model-based corrections for PS in the statistical literature. For Gaussian models on a continuous spatial domain, \citet{DiggleEtAl2010} and \citet{PatiEtAl2011} jointly modeled the process of interest and the locations chosen for sampling.  In particular, they expressed sampled locations as an inhomogeneous Poisson point process where the underlying log-scale intensity at a given location depended linearly on the process of interest at that location.  For instance, writing observations of the spatial process (random field) at a location $i$ as
+\begin{eqnarray}
+   Z_i & = & \mu_i + \epsilon_i,
+   \label{eq:Z_cont}
+\end{eqnarray}
+the log-scale relative intensity of sampling locations at $i$ ($\kappa_i$) could be written as
+\begin{eqnarray}
+   \kappa_i & \propto & \xi_i + b \mu_i,
+   \label{eq:p_cont}
+\end{eqnarray}
+where $\mu_i$ and $\xi_i$ can both be written as a function of predictive covariates.
+Here, the parameter $b$ describes the level of PS; $b=0$ implies no PS, $b>0$ implies a greater level of sampling in locations where the spatial process (e.g. population density) is high, and $b<0$ implies greater sampling where the spatial process is low.  Importantly, when explanatory covariates are used in models for $\mu_i$ and $\xi_i$, \citet{PatiEtAl2011} show that accounting for preferential sampling  ``. . . is only necessary when there
+is an association between the spatial surface of interest and the sampling density that cannot be
+explained by the shared spatial covariates" (see e.g. fig. \ref{fig:PS_example}).    \citet{PatiEtAl2011} also consider a simpler, plug-in based estimator in which log sampling density (specifically, a two dimensional kernel density estimate) is used as an additional fixed effect in eqn. (\ref{eq:Z_cont}), finding that this approach helped reduce bias associated with PS, but did not perform as well as the full joint model.
+
+\subsection{A generalized preferential sampling model}
+
+The models considered by \citet{DiggleEtAl2010} and \citet{PatiEtAl2011} are a useful first step in addressing and modeling PS.  However, they are somewhat limited since they are specific to continuous spatial domains, continuous data (as opposed to presence/absence or count data), and Gaussian error distributions.  Also, they require the linear predictor of the PS model to be written as a simple linear function of the spatial process.  In real world applications, we can envision cases where sampling is strongly preferential in certain areas of the landscape, and not in others.  For instance, sampling may be more strongly preferential close to bases of operations, (e.g. landing strips in the case of aerial surveys), but less so in areas that are harder to get to.
+
+Given these limitations, our present task is to generalize PS models to the types of data more typical of SMPDs, and to allow the degree of PS to vary across the landscape.  Like \citet{DiggleEtAl2010} and \citet{PatiEtAl2011}, we impose a joint model for the process of interest (abundance or occurrence) and the locations chosen for sampling. For the abundance process model, we start with eqn. (\ref{eq:process}) as a general formulation for non-Gaussian data, writing the link-scale expectation as in eqn. (\ref{eq:mu}).
+Next, recalling that $R_i$ is a binary indicator taking on the value 1.0 if survey unit $i$ is sampled, and is 0.0 otherwise, we model $R_i$ using a Bernoulli distribution:
+\begin{eqnarray}
+ \label{eq:R}
+  [R_i] & = & \text{Bernoulli}(h^{-1}(\nu_i)),
+\end{eqnarray}
+where $h()$ denotes a link function appropriate for binary data (e.g. logit, probit).  We then write the intensity for this model as
+\begin{eqnarray}
+  \label{eq:nu}
+  \boldsymbol{\nu} & = & \beta_0^* + {\bf x}^* \boldsymbol{\beta}^*+\boldsymbol{\eta}+{\bf B} \boldsymbol{\delta}.
+\label{eq:nu}
+\end{eqnarray}
+  As with the process model, the sampling intensity model has an intercept ($\beta_0^*$), explanatory covariates (${\bf x}_i^*$), fixed effect regression parameters ($\boldsymbol{\beta}^*$) and spatially autocorrelated random effects ($\boldsymbol{\eta}$ and $\boldsymbol{\delta}$).  The predictive covariates ${\bf x}_i$ from eqn. (\ref{eq:mu}) and ${\bf x}_i^*$ from eqn. (\ref{eq:nu}) may or may not be the same.  Note also that the  spatially autocorrelated random effects $\boldsymbol{\delta}$ are included in both eqns. (\ref{eq:mu}) and (\ref{eq:nu}), allowing for dependency in the two models, with the matrix {\bf B} describing the strength and type of dependence between sampling intensity and the process of interest.  The spatially autocorrelated random effects $\bfeta$ are assumed independent of the $\bfdelta$.
+
+ The formulation in eqn. (\ref{eq:nu}) is similar (but not identical) to one proposed by \citet{RoyleBerliner1999} for hierarchical multivariate models with spatial dependence.  There are multiple ways of structuring ${\bf B}$ depending on the complexity of spatial dependence desired for the PS process \citep{RoyleBerliner1999}.  For instance, setting ${\bf B} = {\bf 0}_{S \times S}$ (i.e. to an all-zero matrix) corresponds to an absence of spatial dependence (and thus no PS).  Setting ${\bf B} = b {\bf I}$, where $b$ is an estimated parameter and {\bf I} is an $(S \times S)$ identity matrix corresponds to the linear PS model suggested by \citet{DiggleEtAl2010} and \citet{PatiEtAl2011}.  Alternatively, we could allow the degree of PS to vary across the landscape.  For instance, one could contemplate a trend surface model for PS by specifying a matrix for ${\bf B}$, with diagonal entries given by
+ \begin{eqnarray*}
+   \label{eq:ts}
+   B_{ii} & = & b_0 + b_1 \textrm{lat}_i + b_2 \textrm{long}_i
+ \end{eqnarray*}
+ and $B_{ij}=0$ for $i \ne j$.  Here, $b_0$, $b_1$, and $b_2$ are estimated parameters and $\textrm{lat}_i$ and $\textrm{long}_i$ give latitude and longitude, respectively \citep{RoyleBerliner1999}.  To our knowledge, the identifiability of higher order models (such as trend surfaces) has not been investigated.
+
+A comparison of the performance of models with different sets of constraints on ${\bf B}$ can serve as a test of PS.  In particular, if one can demonstrate that models with ${\bf B}={\bf 0}$ perform similarly or better than models with ${\bf B} \ne {\bf 0}$, then PS is likely not worth modeling and inference can proceed using standard SMPDs.
+
+
+\subsection{Simulation study}
+
+To illustrate PS and demonstrate that our proposed model has reasonable performance, we conducted a small simulation experiment.  For each of 500 simulations, we generated abundance of a hypothetical species over a $25 \times 25$ grid as
+\begin{eqnarray*}
+  [N_i|\mu_i] & = & \textrm{Poisson}(\exp(\mu_i)),
+\end{eqnarray*}
+where $i$ indexes survey unit $i$, and $\mu_i$ is determined according to eqn. (\ref{eq:mu}). Abundance was generated as a function of a single spatially autocorrelated landscape covariate, as well as residual spatial autocorrelation ($\delta_i$) and overdispersion (fig. \ref{fig:PS_sims}). Specific details of data generation procedures are provided in Appendix S1.
+
+For each simulated landscape we generated three virtual count surveys using eqs. \ref{eq:R} and \ref{eq:nu}.  Each survey had $\boldsymbol{\beta}^*=\eta_i=0$ (that is, no covariate or spatially autocorrelated random effects on the probability of sampling), but differed in how the matrix ${\bf B}$ was parameterized.  In the first, we set ${\bf B}=0$, so that surveyed locations were randomly selected (i.e. independent of abundance).  For the second and third, we set ${\bf B}$ to be a diagonal matrix with entries $b=1$ and $b=3$, respectively, so that the probability of sampling a given survey unit (grid cell) was explicitly dependent on the spatial abundance process in that unit.  We refer to these scenarios as moderate and pathological PS, respectively (see fig. \ref{fig:sim_R}).  Simulations were configured so that $n=50$ of the 625 survey units were sampled; each survey covered half of each target cell.
+
+We fitted two different models to each count dataset. In the first model, the elements of \textbf{B} in eqn. (\ref{eq:nu}) were all set to zero.  In this case, sampling intensity is assumed to be independent of underlying abundance, as implicitly assumed by most SDMs in the ecological literature.  In the second model, we included an explicit connection between the abundance distribution and the sampling process by setting $\textbf{B}=b\textbf{I}$, where $b$ is an estimated parameter, and \textbf{I} is an identity matrix. For ease of exposition, we set $p_i = 1.0$ for all simulations (i.e. all animals present were assumed to be detected).  Each model included the same habitat covariate that was used to generate the data as a log-linear predictor of abundance.
+
+
+\subsection{Bearded seal count surveys}
+
+We applied our modeling technique to counts of bearded seals obtained on aerial transects flown over the eastern Bering Sea from 10-16 April 2012 (fig. \ref{fig:bearded_ests}). These counts were gathered as part of a larger survey designed to estimate abundance of four species of ice-associated seals; the survey is described in greater detail elsewhere \citep{ConnEtAl2014,ConnEtAl2015}. The survey area considered here consists of 25 x 25 km grid cells bordered to the north by the Bering Strait, to the west by the International Date Line, to the south by maximal April ice extent, and to the east by Alaska. Here, we limit counts to those gathered within a one week period so that relative abundance will remain relatively constant throughout the study area.  Our primary focus in this application is to diagnose PS (rather than to estimate absolute abundance).  As such, we do not attempt to correct for nuisance processes such as incomplete detection or species misclassification, which requires models of increased sophistication \citep{ConnEtAl2014}.
+
+Our choice to model bearded seal counts, as opposed to one of the other seal species, is based on the observation that bearded seal densities tend to be highest in the northern portion of the study area. This is also the location of one of the primary airports used to prosecute surveys (Nome, Alaska, USA).  Although we would not anticipate a large effect, higher survey coverage in areas of high bearded seal density could potentially lead to positive bias in apparent abundance owing to PS.
+
+To test for such an effect, we conceptualized bearded seal counts as arising according to the formulation
+\begin{eqnarray*}
+  [Z_i | \mu_i] & = & \textrm{Poisson}(a_i \exp(\mu_i)) \\
+{}  [Y_i|Z_i] & = & \textrm{Binomial}(Z_i, A_i), \text{ where}
+\end{eqnarray*}
+$a_i$ gives the proportion of grid cell $i$ that is composed of salt water habitat, $A_i$ defines the proportion of salt water habitat in grid cell $i$ that is sampled, and $\mu_i$ is defined in eqn. (\ref{eq:mu}).
+We modeled the grid cells that were chosen for sampling using eqns. (\ref{eq:R}-\ref{eq:nu}).
+
+We fitted a total of six models ($M_{cov=0,b=0},M_{cov=0,b=1},M_{cov=1,b=0},M_{cov=1,b=1},M_{cov=1,b=ts},M_{cov=1,b=ts}$) to bearded seal count data using the same estimation framework as in the simulation study.  Models varied by (i) whether or not habitat and landscape variables were used as predictors of bearded seal density ($cov=1$ and $cov=0$, respectively), and (ii) the form of PS ($b=0$ indicates no PS; $b=1$ indicates ${\bf B}=b{\bf I}$; $b=ts$ indicates a trend surface specification for PS, see eqn. \ref{eq:ts}).  When habitat and landscape variables were included, we used the following log-linear predictors for the abundance process: linear and quadratic functions of sea-ice concentration, linear and quadratic functions of depth, distance from land, and distance from the southern ice edge. In contrast, distance from the Alaska mainland was the only predictor used for sampling intensity ($\bfnu$). Remotely sensed sea-ice data were obtained at a $25 \times 25$ km resolution from the National Snow and Ice Data Center, Boulder, CO, USA, as described by \citet{ConnEtAl2014}. All measurements were made relative to grid cell centroids.  Models for $\mu_i$ and $\nu_i$ both utilized spatially autocorrelated random effects with a Mat\'{e}rn covariance function (see Appendix S1 for further details).
+
+To compare and contrast models, we calculated marginal AIC (having marginalized over spatial random effects; see below) and mean square prediction error. Prediction error was calculated using a Monte Carlo cross validation procedure.  For a total of 100 replicates, we randomly selected 40/394 counts to be withheld for testing.  Estimation proceeded using the remaining 354 counts for each of the six estimation models; mean squared error of observed and predicted counts was used as the scoring function for calculation of prediction error with each test data set \citep{HootenHobbs2015}.  Note that in each cross validation analysis that we used $R_i$ values from the full data set (i.e. count predictions were made assuming these cells had been sampled).
+
+\subsection{Computing}
+
+We used maximum marginal likelihood to conduct statistical inference, where the random effects ($\bfeta$ and $\bfdelta$) are integrated out of the likelihood. For increased numerical tractability, we also used the result that the marginal distribution of a Poisson-binomial mixture is itself a Poisson distribution to formulate the likelihood.  In particular, we replaced the binomial observation model (eqn. \ref{eq:obs_binomial}) with the following unconditional specification:
+\begin{eqnarray}
+\label{eq:obs_pois}
+   [Y_i] & = & \text{Poisson}(\exp(\mu_i) A_i a_i).
+\end{eqnarray}
+Predictions of abundance in locations $i$ and attendant standard errors were then estimated with respect to $\hat{N}_i = a_i \exp(\mu_i)$.
+
+We used Template Model Builder \citep[TMB; ][]{KristensenEtAl2016}, interfaced with the R programming environment, to conduct maximization. The TMB software uses a Laplace approximation to integrate out random effects ($\bfeta$ and $\bfdelta$), and a bias correction algorithm \citep{TierneyEtAl1989,ThorsonKristensen2016} to obtain abundance estimates and standard errors that properly account for nonlinear transformations of random effects.  This approach resulted in a facile implementation and fast computing times, allowing us to conduct simulation and model testing with greater efficiency than would have been possible with Bayesian simulation.  Further detail on statistical methods are provided in Appendix S1; requisite R and TMB code will be published to a publicly accessible repository upon acceptance, and is also available at \url{https://github.com/NMML/pref_sampling/}.
+
+\section{Results}
+
+\subsection{Simulation study}
+
+A substantial proportion of simulation replicates included models that were unstable (i.e. either did not converge or had $b$ estimated on a boundary; Appendix S2).  In particular, 00.6\% of spatial models fit with $b$ fixed to zero were unstable, compared to  20.5\% when $b$ was estimated and the true value of $b$ was either zero (no preferential sampling) or 1.0 (moderate preferential sampling).  Under pathological preferential sampling ($b=3.0$), 78.8\% of simulations failed to produce reliable results when $b$ was estimated.  Here, we only present results for cases where models produced stable estimates.
+
+Estimates of cumulative animal abundance across simulated landscapes were relatively unbiased (-4\% for the canonical SMPD and 5\% for the joint model) in the scenario where survey locations were selected randomly (i.e. independent of abundance; fig. \ref{fig:sim_bias}).  Under this scenario, abundance estimates had higher variance when $b$ was estimated.  Under moderate PS ($b=1$), estimation of the PS parameter $b$ continued to result in unbiased estimates of abundance (-1\%), while the canonical SMPD model ignoring preferential sampling had a mean bias of 48\%.  Under pathological PS ($b=3$), the canonical SMPD model was extremely biased (mean bias of 159\%) while the joint model had a relatively small positive mean bias of 6\% (fig. \ref{fig:sim_bias}).  Monte Carlo error on bias of abundance estimates was 1-2\% for each scenario.  In contrast to abundance, the slope of the regression parameter relating abundance to the simulated habitat covariate was unbiased for all scenarios (Appendix S2).
+
+
+\subsection{Bearded seal analysis}
+
+In models where one was estimated, the preferential sampling effect was large and positive (e.g. $\hat{b}=9.7$ for the $M_{cov=1,b=1}$ model).  An estimate of this magnitude implies that we effectively sampled all locations where bearded seals were present, which seems biologically implausible given that survey effort was allocated to maximize spatial coverage rather than to target specific pockets of high bearded seal density.  Further, these point estimates well exceeded estimates from the simulation study where moderate or even pathological levels of preferential sampling were employed.  Thus, despite better marginal AIC scores for models with a preferential sampling effect than without (Table \ref{tab:aic}), we regard results of the joint preferential sampling model as unreliable in this example.  This view is further supported by examination of cross-validated mean square prediction error, which suggests better predictive performance of models without a preferential sampling effect (Table \ref{tab:aic}).  Given these findings, we suggest that researchers employ multiple metrics to diagnose the existence of PS, with more weight given to cross validatory predictive performance than AIC (see \textit{Discussion} for further suggestions on diagnosing PS).
+
+Predictive performance was roughly similar for models with and without landscape and habitat covariates (Table \ref{tab:aic}).  However, this does not necessarily indicate that such covariates are ecologically unimportant, as spatial random effects and habitat effects can be confounded in spatial regression models \citep{HodgesReich2010}.
+
+Finally, we note that estimates of bearded seal abundance in individual cells can become negative when the preferential sampling effect is strongly positive using our estimation approach.  This is because the bias correction algorithm \citep{TierneyEtAl1989,ThorsonKristensen2016} used to correct for the nonlinear transformation of log-scale abundance does not prevent estimates from becoming negative.  Post hoc experimentation with different priors on the preferential sampling parameter $b$ indicated that the frequency and magnitude of negative estimates declined as estimates of $b$ decreased towards biologically plausible values.  This phenomenon could be avoided altogether by conducting a fully Bayesian analysis.
+
+
+\section{Discussion}
+
+
+In this study, we showed that preferential sampling can have a profound impact on the quality of estimates (e.g. population abundance) when sampling is non-randomized. In simulations, naive estimators were increasingly positively biased as PS increased. When PS was present, we were able to substantially reduce bias by conducting estimation under a framework where the state variable of interest and the sites chosen for sampling were jointly modeled using a dependent covariance structure.  In absence of PS, simulations indicated that models with a PS effect produced less precise estimates. Thus, there was a real cost for attempting to account for PS within a model-based framework.  Fortunately, PS only seemed to be a problem if density or abundance is of interest. Estimates of slope parameters governing the relationship of relative abundance to habitat and landscape parameters did not appear to be affected (Appendix S2).
+
+Bias attributed to PS may seem counterintuitive, especially given the maxim in survey sampling to allocate more effort to strata for which population density is high (at least when the goal is to maximize precision of population estimates). For instance, in large-scale line transect surveys under stratified sampling, the optimal amount of effort that should be allocated to stratum $s$ is $A_s D_s^{0.5}$, where $A_s$ is the area of $s$ and $D_s$ is the anticipated density \citep[][eqn 7.7]{BucklandEtAl2001}.  Thus, there are theoretical reasons to sample more in high density areas than in low-density areas. One solution is to sample more in locations where covariates suggest abundance will be higher; in this case, sampling will not be preferential as long as the covariate used to select sampling locations is also used as an explanatory covariate in the SMPD (fig. \ref{fig:PS_example}).  Another approach is to account for variation in sampling intensity with explanatory covariates or \textit{post hoc} stratification. However, it is not always clear how to perform \textit{post hoc} stratification when effort is allocated in a subjective manner.
+
+When applied to bearded seal count data, models with a preferential sampling effect produced considerably lower abundance estimates than models without a PS effect (Table \ref{tab:aic}).  However, such estimates were biologically unreasonable despite being favored by AIC (Table \ref{tab:aic}).  In particular, estimates of preferential sampling parameters were so extreme as to indicate we had visited all survey units with substantial numbers of bearded seal.  This was clearly unreasonable given the manner in which survey effort had been allocated, which sought to maximize spatial coverage while ignoring the expected spatial distribution of animals at finer scales.  Given this finding, we caution against using likelihood-based model selection diagnostics for choosing between models with and without preferential sampling effects.  Metrics based on predictive ability (e.g. cross-validated mean square prediction error) seem more useful for this purpose; in our bearded seal example, models without a preferential sampling effect had better predictive ability (Table \ref{tab:aic}).  We also caution ecologists to be aware of biologically implausible values for $\hat{b}$.  In particular, ``high" values (e.g. $>3.0$) seem improbable, even when sampling is nonrandom (fig. \ref{fig:PS_example}).  For scientific surveys that are nonrandom but avoid explicit targeting (e.g. in the bearded seal example), values greater than 1.0 seem unlikely.  Finally, values less than zero indicate that survey effort is concentrated in places where abundance is anomalously low, which seems unlikely to occur in practice.  Unfortunately, placing informative priors on $b$ was not sufficient to remedy instability (a posthoc model with a Normal(0,1) prior on $b$ still produced implausible estimates).
+
+We fitted models to bearded seal data where the degree of PS changed over the landscape, as \citet{RoyleBerliner1999} suggested might be possible (but never demonstrated) for multivariate spatial models. Such models led to similar inferences to models with a simple, linear effect for PS.  However, given the potential for PS model instability, we currently suggest limiting initial consideration to models with a single, estimated $b$ parameter as a composite adjustment to abundance or occupancy.  Further research into the viability of including spatial variation in the ${\bf B}$ matrix certainly appears warranted.  It would also be worthwhile to investigate whether the reliability of inference varies as a function of data type (e.g. binary vs. count data), survey type (e.g. line transects vs. point counts), and whether parameters remain identifiable when nuisances processes such as incomplete detection are modeled.
+
+The models we have developed here are specific to spatial models with discrete support, as when data are gathered at the plot level, or aggregated prior to analysis.  However, it should be possible to extend our approach to continuous space.  One approach would be to model sampling locations as realizations from a spatial point process in a manner similar to \citet{WartonShepherd2010}. Another possible extension would be to consider models for the sampling process where sampling occurs without replacement for a fixed sample size.  For instance, the Bernoulli sampling model makes the implicit assumption that sample size is random.  If, instead, a fixed number of locations are sampled, the Bernoulli model is somewhat misspecified.  Our simulations suggest some robustness to this misspecification, as the Bernoulli model performed reasonably well when sampling was conducted with a fixed sample size (fig. \ref{fig:sim_bias}).  A more precise treatment would require extending the hypergeometric distribution to have variable inclusion probabilities when formulating the sampling model; this extension is nontrivial.
+
+We have focused here on selection of survey units at a rather coarse scale.  If survey units are large relative to the area that is sampled, ecologists also need to pay attention to how sampling is conducted within survey units selected for sampling.  In particular, the areas visited within selected sample units should be representative (or random) with respect to available habitat within the survey unit or additional bias can result (e.g. fig. \ref{fig:pref})
+
+Our conception of PS is related, but not equivalent to ``sample selection bias" \citep[e.g.][]{PhillipsEtAl2009} in presence-only models.  In such models, species absences are never directly observed.  To draw inference about space use, it is thus necessary to produce a background sample representing the range of locations and habitats that could have been sampled. Sample selection bias then results if the characteristics of sites selected for sampling (e.g. by a volunteer or museum collector) differ systematically from the assumed background sample.  In our case, we use PS to refer to the case where absences are available, but where the probability of sampling is dependent on some unknown factor that is also related to abundance or presence of the target species.
+
+\section{Conclusion}
+
+Model-based approaches to estimation of abundance or occurrence have become popular in recent years.  We (the authors) have noticed a tendency for analysts to assume that inclusion of spatial covariates or random effects into predictive models will make the underlying sampling design ignorable. Although this may be reasonable for some goals (e.g. describing relative influence of different environmental and habitat predictors), we have shown that estimates of absolute quantities (abundance, density, or occupancy) may be biased under preferential sampling.  We have also shown that it is possible to further diagnose and adjust for preferential sampling by jointly modeling dependence between the data collection mechanism and the process of interest (e.g. abundance or occupancy).  However, such models can be considerably less precise and have greater instability than models without a preferential sampling parameter. Where possible, we suggest that survey planners incorporate design-based elements (e.g. random or systematic sampling) into their survey designs to increase robustness and reduce the need for model-based triage.
+
+ \acks{
+Funding for aerial surveys was provided
+by the U.S. National Oceanic and Atmospheric Administration and by the U.S. Bureau of Ocean Energy Management.  Views expressed are those of the authors and do not necessarily represent findings or policy of any government agency.  Use of trade or brand names does not indicate endorsement by the U.S. government.}
+
+
+\vspace{.3in}
+\section{Data accessibility}
+R scripts and data necessary to recreate analyses have been collated into an R package, which is currently available at \url{https://github.com/NMML/pref_sampling}.  We plan to publish the package to an online archive/repository upon acceptance. \\
+
+
+\bibliographystyle{bes}
+\bibliography{master_bib}
+
+
+\pagebreak
+\begin{table}[ht]
+\caption{A summary of model selection results and estimated abundance for the six models fitted to bearded seal counts.  The models include formulations with or without predictive covariates ($cov=1$ or $cov=0$, respectively) , and with different specifications for preferential sampling ($b=0$: fixed to zero; $b=1$: a single $b$ parameter estimated; $b=ts$: a trend surface model for $b$).  All models included spatially autocorrelated random effects on log-scale abundance intensity and on the probability of sampling.  Shown are the log integrated likelihood, the number of fixed effect parameters, cross-validated mean square prediction error (``CV-MSPE"), $\Delta \textrm{AIC}$, and estimated apparent abundance over the landscape ($\hat{N}$) together with a Hessian-based standard error estimate.  Estimates are ranked in order of decreasing predictive ability (as determined by increasing Median MSE).
+}
+\label{tab:aic}
+\raggedright
+\begin{tabular}{lccccc}
+  \hline
+  Model & Log likelihood & Params. & CV-MSPE (SE)& $\Delta \textrm{AIC}$ & $\hat{N}$(SE) \\
+  \hline
+ $M_{cov=0,b=0}$ & -852.7 & 5 & 87.2 & 99.1 & 70738 (6988) \\
+ $M_{cov=1,b=0}$ & -847.6 & 12 & 88.3 & 103.0 & 66989 (20374) \\
+ $M_{cov=1,b=ts}$ & -794.1 & 15 & 99.5 & 1.8 & 40925 (4403) \\
+ $M_{cov=1,b=1}$ & -795.1 & 13 & 105.3 & 0.0 & 40656 (3664) \\
+ $M_{cov=0,b=ts}$ & -802.7 & 8 &  110.7 & 5.2 & 43520 (2770)  \\
+ $M_{cov=0,b=1}$ & -803.0 & 6 & 116.2 & 1.9 & 43232 (2778) \\
+  \hline
+\end{tabular}
+\\
+\end{table}
+
+\pagebreak
+
+\begin{figure*}
+\begin{center}
+\includegraphics[width=170mm]{pref_sampling_ex.pdf}
+\caption{A depiction of preferential sampling in a simplified setting. In this example, we generate abundance as a log-linear function (blue lines) of a hypothetical covariate subject to lognormal error (black and orange points).  In (A. Nonpreferential), we sample 20 abundance values (orange points), where the probability of selection is proportional to the covariate value. In (B. Preferential), the probability of selection is proportional to the abundance value. Orange lines give bias-corrected log-linear models fitted to sampled points (assuming abundances are observed perfectly).  In both cases, the mean sampled abundance is greater than the population mean. However, the sample in (A) is non-preferential if the covariate is also used to estimate the species-covariate relationship.  In contrast, the sample in (B) is preferential and can lead to biased inference about the intercept of the covariate-abundance relationship (and hence to estimates of absolute abundance).}
+\label{fig:PS_example}
+\end{center}
+\end{figure*}
+
+
+\begin{figure*} %[ht]
+\begin{center}
+\includegraphics[width=170mm]{Pref_samp_sim_maps.pdf}
+\caption{An example of a single simulation replicate examining estimates of abundance from a naive SMPD under preferential sampling.  First, true abundance (C) is generated as a function of a spatially autocorrelated covariate (A) and a spatially autocorrelated random effect (B). Second, counts are generated for three different types of surveys, including a simple random sample ($b=0$; D) and surveys with moderate ($b=1$; E) or pathological ($b=3$; F) levels of preferential sampling.  Finally, spatially explicit estimates of abundance are generated using a naive SMPD (with $b$ set to 0.0) to each of the count datasets (G-I).  In this particular simulation replicate, cumulative abundance was overestimated by 9\% when $b=0$, overestimated by 79\% when $b=1$, and overestimated by 308\% when $b=3$.  For a summary of bias over 500 simulation replicates, see fig. \ref{fig:sim_bias}.}
+\label{fig:PS_sims}
+\end{center}
+\end{figure*}
+
+\begin{figure*} %[ht]
+\begin{center}
+\includegraphics[width=170mm]{sim_R.pdf}
+\caption{Expected relationship between the probability of a survey unit being selected for sampling and its abundance residual in the simulation study. The base case $b=0$ represents simple random sampling, while $b=1$ and $b=3$ represent moderate and pathological levels of preferential sampling, respectively.  Also shown are is the realized distribution (smoothed histogram) of abundance residuals among survey units in the simulation study, scaled to fit in the plot margins (solid black line).}
+\label{fig:sim_R}
+\end{center}
+\end{figure*}
+
+
+
+\begin{figure*} %[ht]
+\begin{center}
+\includegraphics[width=170mm]{bias.pdf}
+\caption{Relative proportional error in abundance from the simulation experiment computed with respect to bias-corrected marginal maximum likelihood estimates. Each boxplot summarizes the distribution of relative proportional error as a function of the type of sampling, including simple random sampling ($b=0$), moderate preferential sampling ($b=1$), and pathological preferential sampling ($b=3$). Results vary by the type of estimation model; in the ``independent" model, $b$ is set to 0.0; in the ``joint" model, $b$ is estimated.  Lower and upper limits of each box correspond to first and third quartiles, while whiskers extend to the lowest and highest observed bias within 1.5 interquartile range units from the box.  Points denote outliers outside of this range.  Horizontal lines within boxes denote median bias.  }
+\label{fig:sim_bias}
+\end{center}
+\end{figure*}
+
+\begin{figure*} %[ht]
+\begin{center}
+\includegraphics[width=170mm]{bearded_ests.pdf}
+\caption{Aerial survey counts and estimated apparent abundance of bearded seals in the eastern Bering Sea, April 10-16, 2012. Counts and estimates are shown relative to a survey grid that extends south from the Bering Strait and borders Alaska to the east. In (A), tan shading denotes land, unsurveyed grid cells appear in dark gray, and counts appear in a white-blue spectrum.  Apparent bearded seal abundance estimates (B) are presented from the model with the best predictive ability (according to cross-validation), which was a simple spatial surface model without predictive covariates or a preferential sampling effect (model $M_{cov=0,b=0}$ from Table \ref{tab:aic}).  Apparent abundance estimates are uncorrected for imperfect detection or species misclassification.}
+\label{fig:bearded_ests}
+\end{center}
+\end{figure*}
+
+\begin{figure*} %[ht]
+\begin{center}
+\includegraphics[width=170mm]{Pref_sampling_diag.pdf}
+\caption{A depiction of two types of preferential sampling.  In (A), an investigator preferentially places point transects (red squares) within regions of high known animal density (blue polygons).  This can cause bias in abundance or occupancy estimators unless this \textit{a priori} knowledge about density is explicitly modeled.  In (B), a fine-scale version of preferential sampling occurs when a line transect (red line) is intentionally placed across a region of high quality habitat.  If a landscape is discretized into homogeneous survey units for analysis (as in a grid), it is essential that the habitat surveyed within each survey unit is randomized (or representative of available habitat) when estimating abundance.  If not, bias (usually positive) can be expected.}
+\label{fig:pref}
+\end{center}
+\end{figure*}
+
+\end{document}
+

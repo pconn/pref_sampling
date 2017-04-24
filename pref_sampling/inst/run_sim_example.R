@@ -19,12 +19,12 @@ Alpha = 1  # Smoothness for GMRF, 1 or 2 (1 is faster)
 RandomSeed = ceiling(runif(1,min=1,max=1e6))
 
 # Configurations
-b_set = c(0,1,5)            # Impact of delta on sampling intensity
+b_set = c(0,1,3)            # Impact of delta on sampling intensity
 EM_set = c("fix_b","est_b")
 
 # Configurations
 
-set.seed(12345)
+set.seed(2222222)
 
 Counts=Est=vector("list",3)
 
@@ -127,8 +127,8 @@ for(SimI in 1:length(b_set)){
     Obj$fn( Obj$par )
     
     # Run
-    Lower = -Inf
-    Upper = Inf
+    Lower = -50
+    Upper = 50
     Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, lower=Lower, upper=Upper, control=list(trace=1, maxit=1000))         #
     Opt[["diagnostics"]] = data.frame( "Param"=names(Obj$par), "Lower"=-Inf, "Est"=Opt$par, "Upper"=Inf, "gradient"=Obj$gr(Opt$par) )
     Report = Obj$report()
@@ -161,7 +161,7 @@ for(SimI in 1:length(b_set)){
     # SD
     #Report = Obj$report()
     SD=sdreport(Obj,bias.correct=TRUE)
-    Est[[SimI]]=SD$unbiased$value[5:629]
+    Est[[SimI]]=SD$unbiased$value[6:630]
     #if( all(c("etainput_s","deltainput_s")%in%names(Map)) ){
     #  Est[[EstI]]=Report$Z_s
     #}else{

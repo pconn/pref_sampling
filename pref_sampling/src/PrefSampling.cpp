@@ -110,7 +110,7 @@ Type objective_function<Type>::operator() ()
   // Slot 2: Include hyperdistribution for delta
   // Slot 3: Include hyperdistribution for eta
   // Slot 4: Output Z_s in ADREPORT (0=no, 1=yes); needed for unbiased map estimates using bias.correct
-  
+  // Slot 5: Indicator for whether to put a prior on preferential sampling parameters
   // Data
   DATA_VECTOR( c_i );       	// Response (count) for each observation i
   DATA_VECTOR( P_i );      // Proportion of survey unit that is surveyed for each observation i
@@ -228,6 +228,11 @@ Type objective_function<Type>::operator() ()
   // Probability of sampling locations
   for(int s=0; s<n_s; s++){
     if( !isNA(y_s(s)) ) jnll_comp(1) -= dbern( y_s(s), R_s(s), true );
+  }
+  if(Options_vec(5)==1){
+    for(int ib=0;ib<n_b;ib++){
+      jnll_comp(1)+=0.5*beta_b(ib)*beta_b(ib);  // N(0,1) prior
+    }
   }
 
   // Total objective

@@ -17,6 +17,7 @@
 \def\bfmu{{\ensuremath\boldsymbol{\mu}}}
 \def\bfSigma{{\ensuremath\boldsymbol{\Sigma}}}
 \def\bfB{\textbf{B}}
+\def\bfZ{\textbf{Z}}
 \newcommand{\VS}{V\&S}
 \newcommand{\tr}{\mbox{tr}}
 
@@ -32,6 +33,8 @@
 %  \end{summary} \keywords statements in the order demonstrated below
 \rm
 Here, we provide line by line responses to associate editor and reviewer comments, suggestions, and edits.  For completeness, we include all reviewer comments in addition to our responses (our responses are in blue).  In addition, our revision includes copy editing corrections from our editorial office and some clarifications in response to additional comments we received from an interested reader. We provide a marked up PDF version of our manuscript showing all changes made.
+
+In the process of conducting revisions we corrected an error in our estimation code (somewhere in the model development and testing process, the link function for $R_i$ was misspecified as multinomial-logit instead of logit).  Correcting this error has led to several qualitative changes to the paper.  Conclusions from the simulation study were strengthened; however, bearded seal conclusions were made more murky.  In particular, both of the model types incorporating preferential sampling (linear and trend surface) appeared to produce biologically unrealistic estimates in the bearded seal example.  This was particularly troubling because AIC favored these models.  We decided to conduct an additional cross validation analysis to quantify predictive ability, and found that non-preferential models produced more accurate predictions.  We now argue against using preferential sampling models for the case study.
 
 \section{Associate editor}
 
@@ -58,10 +61,18 @@ Edwards, T. C., D. R. Cutler, N. E. Zimmermann, L. Geiser, and G. G. Moisen. 200
 
 \textcolor{blue}{We thank the editor for pointing us to these articles - our knowledge of the species distribution modeling literature is admittedly a little lacking.  These papers are certainly germane to the present study, and we have included additional material in the introduction (2nd paragraph) that talks about (1) implications of design vs. model-based inference, and (2) the importance of the particular objective function (e.g., minimizing variance, estimating species-habitat relationships) for optimal design.}
 
+\textcolor{blue}{
 Additionally, we have made the following changes to try to make the manuscript accessible to a wider audience:
 \begin{itemize}
-  \item 
-\end{itemize}
+  \item An additional figure (fig. 1) to more clearly depict preferential sampling for visual learners.
+  \item  In the methods section, we motivate inclusion of spatially autocorrelated random effects by indicating ``Spatially autocorrelated random effects are often included to allow animal density to vary smoothly in space and to account for residual patchiness not explained by predictive covariates."
+  \item We changed ``it is usually impossible to view system state perfectly even in locations where sampling is conducted" to ``it is usually impossible to conduct a complete census of all animals present in a surveyed location"
+  \item We provide examples of survey and observer specific covariates. (visibility, observer experience)
+  \item We changed the ``underlying spatial field of interest" and ``spatially-referenced random field values" to ``the process of interest"
+  \item We changed ``surveyed locations were selected independently of the abundance generating process" to ``surveyed locations were randomly selected (i.e. independent of abundance)."
+  \item We changed ``In this case, the abundance process and sampling intensity submodels were independent, as is the with case canonical SDMs (at least when fitted to presence-absence or count data)" to ``In this case, sampling intensity is assumed to be independent of underlying abundance, as implicitly assumed by most SDMs in the ecological literature."
+  \item Numerous other small changes to wording are documented in the track changes document.
+\end{itemize}}
 
 \section{Reviewer 1}
 
@@ -118,7 +129,11 @@ joint model for $\bfeta$ and $\bfdelta$, as specified by \citet{RoyleBerliner199
 model for $\bfB$?
 
 \textcolor{blue}{
-  As suggested above, we believe our model to be very similar to that proposed by \citet{RoyleBerliner1999}.  We're not seeing how drawing the random effects jointly would necessarily improve performance (we're also having trouble seeing how we could implement this in our chosen software).  Also, after further investigation of the \citet{RoyleBerliner1999} paper, we're not sure they ever actually fit a model with a more complicated relationship in $\bfB$.  In fact, their one example on ozone-temperature analysis uses the same simple diagonal parameterization we used here.  So we think the question remains whether more complicated models for $\bfB$ are ever identifiable, and if so, whether they are reasonable to fit with data sets typical of ecological applications.  We've adjusted text in several places to reflect this. For instance, we state that ``However, to our knowledge the identifiability of higher order models (such as trend surfaces) has not been investigated" when talking about higher order preferential sampling models.  In the discussion, we indicate that ``We attempted to fit models to bearded seal data where the degree of PS changed over the landscape, as \citet{RoyleBerliner1999} suggested might be possible (but never demonstrated) for multivariate spatial models."  We also suggest that identifiability of such models be further investigated in future research.
+  As suggested above, we believe our model to be very similar to that proposed by \citet{RoyleBerliner1999}.  We're not seeing how drawing the random effects jointly would necessarily improve performance (we're also having trouble seeing how we could implement this in our chosen software).  Also, after further investigation of the \citet{RoyleBerliner1999} paper, we're not sure they ever actually fit a model with a more complicated relationship in $\bfB$.  In fact, their one example on ozone-temperature analysis uses the same simple diagonal parameterization we used here.  We've adjusted text in several places to reflect this. For instance, we state that ``However, to our knowledge the identifiability of higher order models (such as trend surfaces) has not been investigated" when talking about higher order preferential sampling models.
+}
+
+\textcolor{blue}{
+  After correcting the error in our estimation model link function (see below), qualitative results have changed somewhat in the bearded seal example, with both the simple single parameter $b$ model and the trend surface model producing similar, vexing results. So, the question of identifiability may actually be one of estimability - i.e., how often do these methods produced reasonable estimates for real world datasets?  We know the single parameter $b$ model works $\approx 80\%$ of the time with simulated data; were we simply unlucky with the bearded seal data set? Or do other factors (e.g., overdispersion, line transects vs. point counts) affect the quality of inference?  In the discussion, we now suggest that identifiability and reliability of inference of such models be investigated in future research.
 }
 
 On line 139, you suggest “we often need to fix $\beta_0^* = 0.0$ . . . to permit parameter identification”. The word
@@ -127,7 +142,7 @@ you provide more guidance about when you would need to fix the intercept at 0, a
 would know they need to fit the intercept at 0?
 
 \textcolor{blue}{
-  This wording was too ambiguous, and was likely a result of initially fitting different types of spatial models to the data.  For instance, ICAR type models have a known parameter redundancy built in, such that the intercept is confounded with the spatial process \citep{RueHeld2005}.  The type of Gaussian process model we settled on and used in analysis does not suffer from this deficiency.  Further confusion resulted from incorrectly specifying a multinomial logit link function in our initial analyses.  We have rectified this mistake in the present version, and all models for $R_i$ are now Bernoulli with a logit link, so that the intercept term is now identifiable.  We now report results for this corrected analysis.
+  Initially we were trying to fit ICAR type models which have a known parameter redundancy built in, such that the intercept is confounded with the spatial process \citep{RueHeld2005}.  However, the type of Gaussian process model we settled on and used in analysis does not suffer from this deficiency, but confusion resulted because somewhere along the way we mistakenly built in a multinomial logit link function into the estimation code for the $R_i$ (whose intercept is also not identifiable).  We have rectified this mistake in the present version, and all models for $R_i$ are now Bernoulli with a logit link, so that the intercept term is now identifiable.  We have rerun all analyses with this corrected configuration.
 }
 
 {\bf Notation}
@@ -147,7 +162,7 @@ On line 61, you indicate $\bfmu$ and $\bfnu$ represent log-scale abundance (asso
 influencing placement of sampling locations. You could then replace $\psi_i$ in equation 6 with $\nu_i$, which would make it immediately clear you were discussing factors influencing the probability of site placement.
 
 \textcolor{blue}{
-  We appreciate the reviewer's attempt to help us streamline notation and to make things clearer for the reader.  We have implemented the basic premise of this idea, although some of the particulars differ from the reviewer's suggestion.  Specifically we now describe $\bfmu$ and $\bfnu$ as indicating ``the link-scale process of interest and the logit of the probability of sampling, respectively.  As with $\bfmu$, this would mean $[Z_i] = f(\exp(\mu_i))$, whereas the distribution of sampling locations can be represented as $[R_i] = f(\text{logit}^{-1}(\nu_i))$, where $\mu_i$ and $\nu_i$ can be written as functions of regression coefficients, habitat covariates, and spatially autocorrelated random effects."  Then in the next section we use $\mu_i$ in eq. 5 and $\nu_i$ in eq. 6, although we retain $xi_i$, since in the next section we also wish to write $\nu_i$ in terms of shared spatial effects.  This is all a little tricky, in that the \citet{DiggleEtAl2010} paper considers a continuous support model (whereas ours is discrete), and the structure is slightly different.  Admittedly, maintaining recognizable notation while keeping precise definitions is a challenge.
+  We appreciate the reviewer's attempt to help us streamline notation and to make things clearer for the reader.  We have implemented the basic premise of this idea, although some of the particulars differ from the reviewer's suggestion.  Specifically we now describe $\bfmu$ and $\bfnu$ as indicating ``the link-scale process of interest and the logit of the probability of sampling, respectively.  As with $\bfmu$, this would mean $[Z_i] = f(\exp(\mu_i))$, whereas the distribution of sampling locations can be represented as $[R_i] = f(\text{logit}^{-1}(\nu_i))$, where $\mu_i$ and $\nu_i$ can be written as functions of regression coefficients, habitat covariates, and spatially autocorrelated random effects."  Then in the next section we use $\mu_i$ in eq. 5 and $\nu_i$ in eq. 6, although we retain $\xi_i$, since in the next section we also wish to write $\nu_i$ in terms of shared spatial effects.  This is all a little tricky, in that the \citet{DiggleEtAl2010} paper considers a continuous support model (whereas ours is discrete), and the structure is slightly different.  Admittedly, maintaining recognizable notation while keeping precise definitions is a challenge.
 }
 
 I understand the model you are specifying under the ``simulation study" subheading, but the notation is
@@ -174,7 +189,7 @@ Line 65: This sentence seems to discount the value of good study design, which i
 based estimation.
 
 \textcolor{blue}{
-We've altered text to be a little less cavalier, now stating that 
+We've altered text to be a little less cavalier, now stating that
 ``Design-based estimation requires that surveys rely on a pre-planned survey design selected probabilistically from an underlying sampling frame \citep{Cochran1977}.  Although randomization can increase legitimacy, model-based estimation is not formally subject to this requirement."
 }
 
@@ -182,7 +197,7 @@ Line 77: It's unclear to me why the distinction between fine and coarse-scale pr
 of interest.
 
 \textcolor{blue}{
-As the size of the sampling unit decreases (with the limit being a point process model in continuous space) there is indeed little difference.  But practically, it seems likely that one could use a reasonable design to select sampling units, but still open themselves to bias if they target non-representative habitat.  However, this point is well taken, and we don't think the distinction necessarily needs to prominence that we've given it.  We now address this topic for the first time in the discussion.
+As the size of the sampling unit decreases (with the limit being a point process model in continuous space) there is indeed little difference.  But practically, it seems likely that one could use a reasonable design to select sampling units, but still open themselves to bias if they target non-representative habitat within individual sampling units.  However, this point is well taken, and we don't think the distinction necessarily needs the prominence we've given it.  We now address this topic for the first time in the discussion.
 }
 
 Line 86: I do not see how the definition offered here differs from your initial description of preferential
@@ -203,12 +218,12 @@ We don't know the answer to this question, although it seems like an important o
 
 Line 195: You only describe 4 models below, not 6.
 
-\textcolor{blue}{Changed}
+\textcolor{blue}{We now report results form all 6 models.}
 
 Simulation study results: can you report bias for other parameters (e.g. slope parameters) in your model,
 even if this is relegated to an appendix?
 
-\textcolor{blue}{Yes, we have created an additional appendix table (S3) that summarizes bias in $b$ (the preferential sampling parameter), as well as bias in the species-habitat parameters.  We don't look at bias in the sampling probability parameters because data were simulated by sampling without replacement (with a fixed number of sampled survey units), whereas the fitted model was Bernoulli (which assumes the number of sampled units is random).  Thus parameters would not be directly comparable.  We also provide convergence statistics in this appendix. %We note that the bias in the slope parameter of the species-habitat relationship %is likely because of the well-known confounding that occurs between regression %coefficients and spatially autocorrelated random effects in spatial models %\citep[e.g.][]{ReichEtAl2006,HodgesReich2010}.
+\textcolor{blue}{Yes, we have created an additional appendix table (S3) that summarizes bias in $b$ (the preferential sampling parameter), as well as bias in the species-habitat parameters.  We also provide convergence statistics in this appendix. Thanks for this suggestion; in particular, it helps show that preferential sampling is not necessarily a big deal if one is only interested in drawing inference on parameters informing species-habitat relationships.  %We note that the bias in the slope parameter of the species-habitat relationship %is likely because of the well-known confounding that occurs between regression %coefficients and spatially autocorrelated random effects in spatial models %\citep[e.g.][]{ReichEtAl2006,HodgesReich2010}.
 }
 
 Paragraph starting on line 219: I find this paragraph very confusing. In particular, it is unclear to me exactly
@@ -217,7 +232,7 @@ without this feature. Specifically, we refitted the model with 20 pseudo-absence
 area to better inform abundance-covariate relationships". Does Fig. 5 reflect this re-fitted model? Why not
 fit all models in this manner for consistency?
 
-\textcolor{blue}{We now include these known zero values in all models.}
+\textcolor{blue}{Our initial thought was that inserting ``pseudo-absences" could possibly impact inference about the preferential sampling parameter because those locations were not actually sampled and shouldn't affect the $R_i$ model. So, we conducted model selection without pseudo-absences, but then inserted them when making predictions. In the revision, we've circumvented this issue by introducing depth as an additional covariate (with linear and quadratic effects). This seems to have remedied the issue with positive estimates of abundance in offshore areas.  So, no need to mess around with pseudo-absences anymore.}
 
 Line 225: a model-averaged estimate of abundance?
 
@@ -225,11 +240,11 @@ Line 225: a model-averaged estimate of abundance?
 
 Table 1: I find these tables are easier to read if models are listed in decreasing order of $\Delta$AIC.
 
-\textcolor{blue}{We now present models in order of $\Delta$AIC.}
+\textcolor{blue}{We now present models in order of decreasing predictive ability (as measured with cross-validated mean square prediction error)}
 
 Fig. 3: In my version, the blue and green dashed lines do not show up in the legend.
 
-\textcolor{blue}{Strange, this is not the case in our version.  Guessing it is an issue with PDF compilation on the MEE submission website.  We'll work with copy editors to ensure it looks right as it heads into production.}
+\textcolor{blue}{Strange, this is not the case in our version.  Guessing it is an issue with PDF compilation on the MEE submission website.  We'll work with copy editors to ensure it looks right if it heads into production.}
 
 
 \bibliography{master_bib}

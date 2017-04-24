@@ -39,7 +39,7 @@ set.seed(12345)
 s_i = Mapping
 y_s = ifelse(1:n_cells %in% s_i, 1, 0)
 x_s_z = cbind(Grid.new@data[,"ice_conc"],Grid.new@data[,"ice_conc"]^2,Grid.new@data[,"dist_edge"],Grid.new@data[,"depth"],Grid.new@data[,"depth"]^2,Grid.new@data[,"dist_land"])  
-x_s_y = cbind(Grid.new@data[,"dist_land"])  
+x_s_y = cbind(Grid.new@data[,"dist_mainland"])  
 x_s_b = matrix(1,nrow=n_cells,ncol=3)  #design matrix for preferential sampling effect
 Centroids=gCentroid(Grid.new,byid=TRUE)
 loc_s=cbind(Centroids$x,Centroids$y)/25067.53 #standardize by making distance between neighboring cells = 1.0
@@ -48,7 +48,6 @@ loc_s[,2]=loc_s[,2]/mean(loc_s[,2])
 colnames(loc_s)=c("x","y")
 rownames(loc_s)=c(1:n_cells)
 x_s_b[,2:3] = loc_s
-cov_y = FALSE  # include fixed effects for y ?
 c_i = Count.data[,"Count"]   #changed to binom for v5, 11/9
 Count=rep(NA,prod(n_cells))
 Count[s_i]=c_i
@@ -57,10 +56,10 @@ mesh = inla.mesh.create( loc_s )
 spde <- (inla.spde2.matern(mesh, alpha=1)$param.inla)[c("M0","M1","M2")]
 
 
-Options_vec = c( 'Prior'=switch(Spatial_model,"ICAR"=1,"SPDE_GMRF"=0), 'Alpha'=Alpha, 'IncludeDelta'=1, 'IncludeEta'=1, 'OutputSE'=1)
+Options_vec = c( 'Prior'=switch(Spatial_model,"ICAR"=1,"SPDE_GMRF"=0), 'Alpha'=Alpha, 'IncludeDelta'=1, 'IncludeEta'=1, 'OutputSE'=1,'bPrior'=0)
 
 
-for(icov in 1:3){
+for(icov in 1:2){
   for(ib in 1:3){
     # Data
     Data = list("Options_vec"=Options_vec, "c_i"=c_i, "P_i"=Prop_sampled,"A_s"=1-Grid.new@data[,"land_cover"],"s_i"=s_i-1, "y_s"=y_s, "spde"=spde)
@@ -73,15 +72,14 @@ for(icov in 1:3){
     if(ib==3)Data$X_sb=cbind(x_s_b)
     
     # Parameters
-    # Intercept is needed for beta_j (delta -- abundance) but not beta_k (eta -- sampling intensity)
     if( Options_vec['Prior']==0 ) etainput_s = deltainput_s = rep(0,mesh$n)
     if( Options_vec['Prior']==1 ) etainput_s = deltainput_s = rep(0,prod(grid_dim))
-    #Params = list("beta_j"=rep(0,ncol(Data$X_sj)), "beta_k"=rep(0,ncol(Data$X_sk)), "b"=0, "logtau_z"=rep(0,2), "logkappa_z"=rep(0,2), "deltainput_s"=deltainput_s, "etainput_s"=etainput_s)
     Params = list("beta_j"=rep(0,ncol(Data$X_sj)), "beta_k"=rep(0,ncol(Data$X_sk)), "beta_b"=rep(0,ncol(Data$X_sb)), "logtau_z"=rep(0,2), "logkappa_z"=rep(0,2), "deltainput_s"=deltainput_s, "etainput_s"=etainput_s)
     
     # Random
     Random = c( "deltainput_s", "etainput_s" )
-    if(Use_REML==TRUE) Random = c(Random,"beta_j","beta_k","beta_b")
+    #if(Use_REML==TRUE) Random = c(Random,"beta_j","beta_k","beta_b")
+    #Random=NULL  use to specify full joint model for MCMC
     
     # Fix parameters
     Map = list()
@@ -111,9 +109,12 @@ for(icov in 1:3){
     # Run
     Lower = -50
     Upper = 50
+    #Lower = -Inf
+    #Upper=Inf
     Opt = nlminb( start=Obj$par, objective=Obj$fn, gradient=Obj$gr, lower=Lower, upper=Upper, control=list(trace=1, maxit=1000))         #
     Opt[["diagnostics"]] = data.frame( "Param"=names(Obj$par), "Lower"=-Inf, "Est"=Opt$par, "Upper"=Inf, "gradient"=Obj$gr(Opt$par) )
     Report = Obj$report()
+    #crap = run_mcmc(Obj,params.init=Opt$par,nsim=1000,algorithm='NUTS')
     
     # Potentially fix random fields with zero sample or population variance
     if( any(Report$MargSD_z<0.001) ){
@@ -142,7 +143,6 @@ for(icov in 1:3){
     }
     
     # SD
-    #Report = Obj$report()
     SD=sdreport(Obj,bias.correct=TRUE)
     Out=list(Opt=Opt,SD=SD,Report=Report)
     fname=paste0("./OutBearded_cov",icov,"_b",ib,"ice0.RData")
@@ -150,15 +150,16 @@ for(icov in 1:3){
   } 
 }
 
+
 #plot map of estimates
-str1='./OutBearded_cov'
-load(paste0(str1,2,"_b",2,"ice0.Rdata"))
-Out$SD$value[1:10]
+str1='./Output/OutBearded_cov'
+load(paste0(str1,1,"_b",0,"ice0.Rdata"))
+Out$SD$unbiased$value[1:10]
 library(RColorBrewer)
 library(ggplot2)
 myPalette=colorRampPalette(brewer.pal(9, "Purples")) 
 #n.fixed.eff=ncol(x_s_z)+2
-n.fixed.eff=4
+n.fixed.eff=2
 N.spat=matrix(Out$SD$unbiased$value[(n.fixed.eff+3):(n_cells+n.fixed.eff+2)],ncol=1)
 Ests = plot_N_map(cur.t=1,N=N.spat,Grid=Grid.new,myPalette=myPalette)
 Ests=Ests+ggtitle("B. Modeled abundance")+theme(plot.title = element_text(hjust = 0,size = rel(1)))

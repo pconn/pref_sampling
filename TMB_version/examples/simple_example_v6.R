@@ -255,9 +255,16 @@ Which.est = which(Results[,"EM"]>1)
 Results[,"Bias_b"]=NA
 Results[Which.est,"Bias_b"]=(Results[Which.est,"b_est"]-Results[Which.est,"b"])
 
-#For figures, limit to results for which abs(bias) < 20 for b
+#
+pdf("B_est.pdf")
+  Which_plot = which(Results[,"EM"]>1)
+  plot(Results[Which_plot,"b_est"],xlab="Simulation",ylab=expression(hat(b)))
+dev.off()
+
+
+#For figures, limit to results for which |b estimate| < 10 
 Results[,"OnBoundary"]=rep(0,nrow(Results))
-Results[which(abs(Results[,"Bias_b"])>20),"OnBoundary"]=1
+Results[which(abs(Results[,"b_est"])>10),"OnBoundary"]=1
 
 Results_plot=Results[Results[,"OnBoundary"]==0,]
 Results_plot[,"Est.model"]=rep("Independent",nrow(Results_plot))
@@ -294,3 +301,47 @@ bias.plot
 pdf("bias.pdf")
 bias.plot
 dev.off()
+
+#bias of b parameter
+BiasB.df = Bias.df[which(!is.na(Bias.df[,"Bias_b"])),]
+bias.plot = ggplot(BiasB.df,aes(factor(b),Bias_b))+geom_boxplot() #+facet_grid(~b) #,scales="free")
+bias.plot=bias.plot + theme(text=element_text(size=20)) #+ coord_cartesian(ylim = c(-1., 6.0))
+bias.plot=bias.plot + theme(axis.text.y=element_text(size=14))
+#bias.plot=bias.plot + geom_point(data=DF.trunc.1,aes(x=Est.mod,y=Bias),shape=2)
+#bias.plot=bias.plot + geom_point(data=DF.trunc.5,aes(x=Est.mod,y=Bias),shape=2)
+bias.plot=bias.plot + labs(x = "True b parameter", y="Absolute bias")
+bias.plot
+pdf("biasB.pdf")
+bias.plot
+dev.off()
+
+#produce plot of bias of species-habitat relationship parameters
+bias.plot = ggplot(Bias.df,aes(factor(Est.model),BiasBeta11))+geom_boxplot()+facet_grid(~b) #,scales="free")
+bias.plot=bias.plot + theme(text=element_text(size=20)) #+ coord_cartesian(ylim = c(-1., 6.0))
+bias.plot=bias.plot + theme(axis.text.y=element_text(size=14))
+#bias.plot=bias.plot + geom_point(data=DF.trunc.1,aes(x=Est.mod,y=Bias),shape=2)
+#bias.plot=bias.plot + geom_point(data=DF.trunc.5,aes(x=Est.mod,y=Bias),shape=2)
+bias.plot=bias.plot + labs(x = "Estimation model", y="Absolute bias")
+bias.plot
+pdf("Bias_beta0.pdf")
+bias.plot
+dev.off()
+
+#produce plot of bias of species-habitat relationship parameters
+bias.plot = ggplot(Bias.df,aes(factor(Est.model),BiasBeta12))+geom_boxplot()+facet_grid(~b) #,scales="free")
+bias.plot=bias.plot + theme(text=element_text(size=20)) #+ coord_cartesian(ylim = c(-1., 6.0))
+bias.plot=bias.plot + theme(axis.text.y=element_text(size=14))
+#bias.plot=bias.plot + geom_point(data=DF.trunc.1,aes(x=Est.mod,y=Bias),shape=2)
+#bias.plot=bias.plot + geom_point(data=DF.trunc.5,aes(x=Est.mod,y=Bias),shape=2)
+bias.plot=bias.plot + labs(x = "Estimation model", y="Absolute bias")
+bias.plot
+pdf("Bias_beta1.pdf")
+bias.plot
+dev.off()
+
+
+Results[,"Converge"]=Results[,"OnBoundary"]+Results[,"Convergence"]
+Results[which(Results[,"Converge"]==2),"Converge"]=1
+Converge_table = summaryBy(Converge~b+EM,data=Results,FUN=sum)
+
+
